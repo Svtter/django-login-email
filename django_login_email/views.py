@@ -41,8 +41,12 @@ class EmailVerifyView(TemplateView, email.EmailValidateMixin):
         token = request.GET.get("token", None)
         if token is None:
             raise Http404("Invalid Request")
-        else:
+        try:
             self.verify_login_mail(request=request, token_v=token)
+        except Exception as e:
+            # TODO: log the error
+            print(e)
+            raise Http404("Invalid Request")
         return redirect(self.get_success_url())
 
     def get_success_url(self):
