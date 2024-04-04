@@ -21,7 +21,7 @@ class EmailLoginInfo(object):
         raise NotImplementedError("You must set the subject and from_email.")
 
     def set_token(self, value):
-        self.message.format(url=self.url, token=value)
+        self.login_message.format(url=self.url, token=value)
 
 
 class EmailInfoMixin(object):
