@@ -1,0 +1,2 @@
+class LoginMailException(Exception):
+    pass

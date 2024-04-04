@@ -1,0 +1,11 @@
+{% extends "login_email/base.html" %}
+
+{% block content %}
+
+<h1>Welcome!</h1>
+<p>Login success when you see this page</p>
+
+{{ error }}
+
+{% comment %} <pre>{% filter force_escape %}{% debug %}{% endfilter %}</pre> {% endcomment %}
+{% endblock content %}

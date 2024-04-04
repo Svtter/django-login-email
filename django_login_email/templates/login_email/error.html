@@ -1,0 +1,11 @@
+{% extends "login_email/base.html" %}
+
+{% block content %}
+
+<h1>Failed!</h1>
+<p>Something went wrong. Please try again.</p>
+
+{{ error }}
+
+{% comment %} <pre>{% filter force_escape %}{% debug %}{% endfilter %}</pre> {% endcomment %}
+{% endblock content %}
