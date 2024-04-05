@@ -51,11 +51,12 @@ class EmailValidateMixin(object):
     def verify_login_mail(self, request, token_v: str):
         m = token.TokenManager()
         emailAndSalt = m.decrypt_token(token=token_v)
-        if not m.check_salt(str(emailAndSalt)):
-            raise Exception("Invalid salt")
+        token_d = m.check_token(emailAndSalt)
+        if token_d is None:
+            raise Exception("Invalid token.")
 
         User = get_user_model()
-        u = User.objects.get(email=m.get_mail(str(emailAndSalt)))
+        u = User.objects.get(email=m.get_mail(token_d))
         if not u.is_active:
             raise Exception("Inactive user, disallow login.")
 
