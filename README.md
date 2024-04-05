@@ -16,7 +16,7 @@ List of the urls for exmaple project:
 ## Feature
 
 - [x] The developer could define their own `User` model.
-- [ ] Time-limited of login link.
+- [x] Time-limited of login link.
 - [ ] limited of sending email.
 - [ ] More easier and customizable login link.
 
