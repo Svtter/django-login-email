@@ -17,3 +17,10 @@ python-dotenv = "^1.0.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.urls]
+homepage = "https://github.com/Svtter/django-login-email"
+repository = "https://github.com/Svtter/django-login-email.git"
+changelog = "https://github.com/Svtter/django-login-email/blob/master/CHANGELOG.md"
+bugs = "https://github.com/Svtter/django-login-email/issues"
+# sponsor = "https://github.com/sponsors/svtter"
