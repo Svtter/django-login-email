@@ -10,7 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
+from dotenv import find_dotenv, load_dotenv
 from pathlib import Path
+
+load_dotenv(find_dotenv())
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -123,3 +127,10 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# You could test this by using https://mailtrap.io/
+EMAIL_HOST = "sandbox.smtp.mailtrap.io"
+EMAIL_HOST_USER = "f9c15aa2704df2"
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = "2525"

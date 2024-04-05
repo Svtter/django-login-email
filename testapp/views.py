@@ -14,3 +14,11 @@ class MyInfo(e.EmailLoginInfo):
 
 class LoginView(v.EmailLoginView):
     email_info_class: MyInfo
+
+
+class VerifyView(v.EmailVerifyView):
+    pass
+
+
+class LogoutView(v.EmailLogoutView):
+    pass

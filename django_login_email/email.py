@@ -1,17 +1,19 @@
 import typing as t
+import string
 
 from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from . import token
 
 
 class EmailLoginInfo(object):
     subject: str
     message: str
-    url = "http://127.0.0.1:8000/account/verify?token="
-    login_message: str = '<a href="{url}{token}"></a>'
+    welcome_text = "Welcome to meterhub! Please click the link below to login.<br>"
+    url: str = "http://127.0.0.1:8000/account/verify?token="
+    login_message: string.Template = string.Template('Click <a href="$url$token">Link</a>')
     from_email: str
 
     def __init__(self) -> None:
@@ -21,7 +23,7 @@ class EmailLoginInfo(object):
         raise NotImplementedError("You must set the subject and from_email.")
 
     def set_token(self, value):
-        self.login_message.format(url=self.url, token=value)
+        self.message = self.welcome_text + self.login_message.substitute(url=self.url, token=value)
 
 
 class EmailInfoMixin(object):
@@ -49,12 +51,17 @@ class EmailValidateMixin(object):
     def verify_login_mail(self, request, token_v: str):
         m = token.TokenManager()
         emailAndSalt = m.decrypt_token(token=token_v)
-        if not m.check_salt(emailAndSalt):
+        if not m.check_salt(str(emailAndSalt)):
             raise Exception("Invalid salt")
 
         User = get_user_model()
-        u = User.objects.get(email=m.get_mail(emailAndSalt))
+        u = User.objects.get(email=m.get_mail(str(emailAndSalt)))
         if not u.is_active:
             raise Exception("Inactive user, disallow login.")
 
         login(request, u)
+
+
+class EmailLogoutMixin(object):
+    def logout(self, request):
+        logout(request)

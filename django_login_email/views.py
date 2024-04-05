@@ -1,6 +1,7 @@
 from typing import Any
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.generic.edit import FormView
 from django.views.generic import TemplateView
 from django.contrib.auth import get_user_model
@@ -13,10 +14,16 @@ from . import token
 m = token.TokenManager()
 
 
+class EmailLoginInfo(email.EmailLoginInfo):
+    def set_variables(self):
+        self.subject = "Hello from meterhub"
+        self.from_email = "sandbox.smtp.mailtrap.io"
+
+
 class EmailLoginView(FormView, email.EmailInfoMixin):
     template_name = "login_email/login.html"
     form_class = forms.LoginForm
-    email_info_class = email.EmailLoginInfo
+    email_info_class = EmailLoginInfo
 
     def form_valid(self, form):
         """check the email"""
@@ -28,6 +35,7 @@ class EmailLoginView(FormView, email.EmailInfoMixin):
             print(e, form.cleaned_data["email"])
             return render(self.request, "login_email/success.html", {"form": form})
         except Exception as e:
+            raise Exception(e)
             print(e)
             return render(self.request, "login_email/error.html", {"error": e})
         return render(self.request, "login_email/success.html", {"form": form})
@@ -45,12 +53,19 @@ class EmailVerifyView(TemplateView, email.EmailValidateMixin):
             self.verify_login_mail(request=request, token_v=token)
         except Exception as e:
             # TODO: log the error
+            raise Exception(e)
             print(e)
             raise Http404("Invalid Request")
         return redirect(self.get_success_url())
 
     def get_success_url(self):
-        return "success"
+        return reverse("home")
+
+
+class EmailLogoutView(TemplateView, email.EmailLogoutMixin):
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.logout(request=request)
+        return redirect("login")
 
 
 class HomeView(TemplateView):
