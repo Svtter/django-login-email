@@ -2,6 +2,10 @@
 
 Allow user to login with only email.
 
+## Install
+
+`pip install django-login-email`
+
 List of the urls for exmaple project:
 
 - `/home` for protected url.
