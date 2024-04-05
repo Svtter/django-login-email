@@ -35,7 +35,6 @@ class EmailLoginView(FormView, email.EmailInfoMixin):
             print(e, form.cleaned_data["email"])
             return render(self.request, "login_email/success.html", {"form": form})
         except Exception as e:
-            raise Exception(e)
             print(e)
             return render(self.request, "login_email/error.html", {"error": e})
         return render(self.request, "login_email/success.html", {"form": form})
@@ -53,7 +52,6 @@ class EmailVerifyView(TemplateView, email.EmailValidateMixin):
             self.verify_login_mail(request=request, token_v=token)
         except Exception as e:
             # TODO: log the error
-            raise Exception(e)
             print(e)
             raise Http404("Invalid Request")
         return redirect(self.get_success_url())
