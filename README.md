@@ -17,7 +17,7 @@ List of the urls for exmaple project:
 
 - [x] The developer could define their own `User` model.
 - [x] Time-limited of login link.
-- [ ] limited of sending email.
+- [x] limited of sending email. Using TimeLimt to set minutes.
 - [ ] More easier and customizable login link.
 
 ## Future

@@ -1,5 +1,9 @@
+from dataclasses import dataclass
 import typing as t
+import abc
 import string
+import datetime
+from datetime import timezone
 
 from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
@@ -30,18 +34,45 @@ class TimeLimit(object):
     minutes: int = 10
 
 
-class EmailInfoMixin(TimeLimit):
+@dataclass
+class MailRecord(object):
+    last_time: t.Optional[datetime.datetime]
+    email: str
+
+
+class MailRecordMixin(abc.ABC):
+
+    @abc.abstractmethod
+    def get_mail_record(self, mail: str) -> MailRecord:
+        # for easy to change. use a function.
+        raise NotImplementedError("You must implement get_mail_record")
+
+    @abc.abstractmethod
+    def set_mail_record(self, mail: str):
+        raise NotImplementedError("You must implement set_mail_record")
+
+
+class EmailInfoMixin(MailRecordMixin):
     email_info_class: t.Type[EmailLoginInfo]
+
+    tl: TimeLimit
 
     def check_user(self, email):
         User = get_user_model()
         u = User.objects.get(email=email)
         return u
 
-    def send_login_mail(self, email: str):
-        self.check_user(email)
+    def check_could_send(self, email):
+        re = self.get_mail_record(email)
+        if (re.last_time is None) or (
+            re.last_time + datetime.timedelta(minutes=self.tl.minutes) <= datetime.datetime.now(tz=timezone.utc)
+        ):
+            return True
+        return False
+
+    def send_valid(self, email: str):
         e = self.email_info_class()
-        m = token.TokenManager(self.minutes)
+        m = token.TokenManager(self.tl.minutes)
 
         token_v = m.encrypt_mail(email)
         e.set_token(token_v)
@@ -50,10 +81,20 @@ class EmailInfoMixin(TimeLimit):
         msg.content_subtype = "html"
         msg.send()
 
+    def send_login_mail(self, email: str):
+        self.check_user(email)
+        if not self.check_could_send(email=email):
+            raise Exception(f"Cannot send. Wait {self.tl.minutes} minutes.")
 
-class EmailValidateMixin(TimeLimit):
+        self.send_valid(email)
+        self.set_mail_record(email)
+
+
+class EmailValidateMixin(object):
+    tl: TimeLimit
+
     def verify_login_mail(self, request, token_v: str):
-        m = token.TokenManager(self.minutes)
+        m = token.TokenManager(self.tl.minutes)
         emailAndSalt = m.decrypt_token(token=token_v)
         token_d = m.check_token(emailAndSalt)
         if token_d is None:

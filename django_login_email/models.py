@@ -5,7 +5,7 @@ from django.db import models
 
 class EmailLogin(models.Model):
     last_time = models.DateTimeField(auto_now_add=True, verbose_name="Last login request time")
-    email = models.EmailField(verbose_name="Email")
+    email = models.EmailField(verbose_name="Email", unique=True, null=False)
 
     @classmethod
     def set_email_last_time(cls, email, datetime) -> "EmailLogin":
@@ -17,5 +17,5 @@ class EmailLogin(models.Model):
         self.last_time = datetime
         self.save()
 
-    def is_send(self, datetime):
-        """if the datetime is large than self.last_time + generator.minutes, return true"""
+    def __str__(self) -> str:
+        return f"Email: {self.email}"
