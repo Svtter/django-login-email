@@ -2,7 +2,23 @@
 
 Allow user to login with only email.
 
-1. User could define their own `User` model.
+List of urls:
+
+- `/home` for protected url.
+- `/account/login` for login.
+- `/account/logout` for logout.
+- `/account/verify` for email verify.
+
+## Feature
+
+- [x] The developer could define their own `User` model.
+- [ ] Time-limited of login link.
+- [ ] limited of sending email.
+- [ ] More easier and customizable login link.
+
+## Future
+
+- Academically prove the safety of this method.
 
 ## Related project
 
