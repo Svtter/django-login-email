@@ -16,7 +16,8 @@ TokenDict = t.TypedDict("TokenDict", {"email": Email, "expire_time": int, "salt"
 
 
 class TokenGenerator(object):
-    minutes: int = 10
+    def __init__(self, minutes: int) -> None:
+        self.minutes = minutes
 
     def get_expire_time(self) -> int:
         return int((datetime.datetime.now() + datetime.timedelta(minutes=self.minutes)).timestamp())
@@ -34,10 +35,11 @@ class TokenGenerator(object):
 class TokenManager(object):
     salt: str = "randomsalt"
     key: bytes
-    generator: TokenGenerator = TokenGenerator()
+    generator: TokenGenerator
 
-    def __init__(self) -> None:
+    def __init__(self, minutes: int) -> None:
         self.key = settings.SECRET_KEY[:32].encode("utf-8")
+        self.generator: TokenGenerator = TokenGenerator(minutes)
 
     def check_token(self, token_uncrypt: str) -> t.Optional[TokenDict]:
         """check salt and expire-time"""

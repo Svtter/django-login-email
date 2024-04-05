@@ -7,11 +7,8 @@ from django.views.generic import TemplateView
 from django.contrib.auth import get_user_model
 from . import forms
 from . import email
-from . import token
 
 # Create your views here.
-
-m = token.TokenManager()
 
 
 class EmailLoginView(FormView, email.EmailInfoMixin):

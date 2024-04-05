@@ -26,7 +26,11 @@ class EmailLoginInfo(object):
         self.message = self.welcome_text + self.login_message.substitute(url=self.url, token=value)
 
 
-class EmailInfoMixin(object):
+class TimeLimit(object):
+    minutes: int = 10
+
+
+class EmailInfoMixin(TimeLimit):
     email_info_class: t.Type[EmailLoginInfo]
 
     def check_user(self, email):
@@ -37,7 +41,7 @@ class EmailInfoMixin(object):
     def send_login_mail(self, email: str):
         self.check_user(email)
         e = self.email_info_class()
-        m = token.TokenManager()
+        m = token.TokenManager(self.minutes)
 
         token_v = m.encrypt_mail(email)
         e.set_token(token_v)
@@ -47,9 +51,9 @@ class EmailInfoMixin(object):
         msg.send()
 
 
-class EmailValidateMixin(object):
+class EmailValidateMixin(TimeLimit):
     def verify_login_mail(self, request, token_v: str):
-        m = token.TokenManager()
+        m = token.TokenManager(self.minutes)
         emailAndSalt = m.decrypt_token(token=token_v)
         token_d = m.check_token(emailAndSalt)
         if token_d is None:

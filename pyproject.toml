@@ -24,3 +24,6 @@ repository = "https://github.com/Svtter/django-login-email.git"
 changelog = "https://github.com/Svtter/django-login-email/blob/master/CHANGELOG.md"
 bugs = "https://github.com/Svtter/django-login-email/issues"
 # sponsor = "https://github.com/sponsors/svtter"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "settings.settings"
