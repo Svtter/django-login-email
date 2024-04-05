@@ -2,7 +2,7 @@
 
 Allow user to login with only email.
 
-List of urls:
+List of the urls for exmaple project:
 
 - `/home` for protected url.
 - `/account/login` for login.
