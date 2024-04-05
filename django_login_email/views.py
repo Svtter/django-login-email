@@ -14,16 +14,10 @@ from . import token
 m = token.TokenManager()
 
 
-class EmailLoginInfo(email.EmailLoginInfo):
-    def set_variables(self):
-        self.subject = "Hello from meterhub"
-        self.from_email = "sandbox.smtp.mailtrap.io"
-
-
 class EmailLoginView(FormView, email.EmailInfoMixin):
     template_name = "login_email/login.html"
     form_class = forms.LoginForm
-    email_info_class = EmailLoginInfo
+    email_info_class = email.EmailLoginInfo
 
     def form_valid(self, form):
         """check the email"""
