@@ -13,24 +13,24 @@ Token = str
 EmailAndSalt = str
 Email = str
 
-TokenDict = t.TypedDict("TokenDict", {"email": Email, "expire_time": int, "salt": str})
+TokenDict = t.TypedDict("TokenDict", {"email": Email, "expired_time": int, "salt": str})
 
 
 class TokenGenerator(object):
     def __init__(self, minutes: int) -> None:
         self.minutes = minutes
 
-    def get_expire_time(self) -> int:
+    def get_expired_time(self) -> int:
         return int((datetime.datetime.now() + datetime.timedelta(minutes=self.minutes)).timestamp())
 
     def gen_salt(self, email) -> str:
-        return email + os.urandom(16)
+        return email + str(base64.b64encode(os.urandom(16)))
 
     def gen(self, email, save_token: t.Callable[[TokenDict], None]) -> str:
         """call save_token to save token in database or somewhere"""
         token: TokenDict = {
             "email": email,
-            "expire_time": self.get_expire_time(),
+            "expired_time": self.get_expired_time(),
             "salt": self.gen_salt(email),
         }
         save_token(token)
@@ -46,12 +46,13 @@ class TokenManager(object):
         self.key = settings.SECRET_KEY[:32].encode("utf-8")
         self.generator: TokenGenerator = TokenGenerator(minutes)
 
-    def check_token(self, token_uncrypt: str, get_salt: t.Callable[[str], str]) -> t.Optional[TokenDict]:
-        """check salt and expire-time"""
+    def transform_token(self, token_uncrypt: Token) -> TokenDict:
         token_dict: TokenDict = json.loads(token_uncrypt)
-        if token_dict["salt"] == get_salt(token_dict["email"]) and token_dict["expire_time"] > int(
-            datetime.datetime.now().timestamp()
-        ):
+        return token_dict
+
+    def check_token(self, token_dict: TokenDict, get_salt: t.Callable[[], str]) -> t.Optional[TokenDict]:
+        """check salt and expire-time"""
+        if token_dict["salt"] == get_salt() and token_dict["expired_time"] > int(datetime.datetime.now().timestamp()):
             return token_dict
         return None
 

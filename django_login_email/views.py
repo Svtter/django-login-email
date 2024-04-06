@@ -24,7 +24,7 @@ class MailRecordModelMixin(email.EmailInfoMixin):
     def reset_mail(self, mail: str):
         # models.EmailLogin.objects.filter(email=mail).delete()
         e = models.EmailLogin.objects.get(email=mail)
-        e.last_time = e.last_time - datetime.timedelta(minutes=self.tl.minutes)
+        e.expired_time = e.expired_time - datetime.timedelta(minutes=self.tl.minutes)
         e.validated = False
         e.save()
 
@@ -32,22 +32,18 @@ class MailRecordModelMixin(email.EmailInfoMixin):
         # for easy to change. use a function.
         try:
             e = models.EmailLogin.objects.get(email=mail)
+            return email.MailRecord(email=e.email, expired_time=e.expired_time, validated=e.validated, sault=e.sault)
         except models.EmailLogin.DoesNotExist:
-            return email.MailRecord(email=mail, last_time=None)
-        return email.MailRecord(email=e.email, last_time=e.last_time)
-
-
-class ModelSaltSaver(email.SaltSaver):
-    def get_salt(self, email: str) -> str:
-        return models.EmailLogin.objects.get(email=email).sault
+            return email.MailRecord(email=mail, expired_time=None, validated=False, sault="")
 
     def save_token(self, token: token.TokenDict):
         try:
-            obj = models.EmailLogin.objects.get(email=token["email"])
-            obj.objects.update(sault=token["salt"])
+            models.EmailLogin.objects.filter(email=token["email"]).update(
+                sault=token["salt"], expired_time=token["expired_time"]
+            )
         except models.EmailLogin.DoesNotExist:
-            obj = models.EmailLogin.objects.create(
-                email=token["email"], sault=token["salt"], last_time=token["expire_time"]
+            models.EmailLogin.objects.create(
+                email=token["email"], sault=token["salt"], expired_time=token["expired_time"]
             )
 
 
@@ -57,8 +53,18 @@ class EmailLoginView(FormView, MailRecordModelMixin):
     email_info_class = email.EmailLoginInfo
     tl = TimeLimit()
 
+    def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        if self.request.user.is_authenticated:
+            return redirect("home")
+        return super().get(request, *args, **kwargs)
+
     def form_valid(self, form):
         """check the email"""
+
+        # Not allow to login if the user is already authenticated.
+        if self.request.user.is_authenticated:
+            return redirect("home")
+
         User = get_user_model()
         try:
             self.send_login_mail(form.cleaned_data["email"])
@@ -67,13 +73,13 @@ class EmailLoginView(FormView, MailRecordModelMixin):
             print(e, form.cleaned_data["email"])
             return render(self.request, "login_email/success.html", {"form": form})
         except Exception as e:
-            # raise Exception(e)
+            raise Exception(e)
             print(e)
             return render(self.request, "login_email/error.html", {"error": e})
         return render(self.request, "login_email/success.html", {"form": form})
 
 
-class EmailVerifyView(TemplateView, email.EmailValidateMixin):
+class EmailVerifyView(TemplateView, email.EmailValidateMixin, MailRecordModelMixin):
     tl = TimeLimit()
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:

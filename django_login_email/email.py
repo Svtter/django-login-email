@@ -36,8 +36,10 @@ class TimeLimit(object):
 
 @dataclass
 class MailRecord(object):
-    last_time: t.Optional[datetime.datetime]
+    expired_time: t.Optional[datetime.datetime]
     email: str
+    validated: bool
+    sault: str
 
 
 class MailRecordMixin(abc.ABC):
@@ -47,21 +49,13 @@ class MailRecordMixin(abc.ABC):
         # for easy to change. use a function.
         raise NotImplementedError("You must implement get_mail_record")
 
-
-class SaltSaver(abc.ABC):
-    """How to save token?"""
-
     @abc.abstractmethod
-    def save_token(self, token_str: token.TokenDict):
+    def save_token(self, token: token.TokenDict):
         """to save token in the database or somewhere."""
         raise NotImplementedError("You must implement save_token")
 
-    @abc.abstractmethod
-    def get_salt(self, email: str) -> str:
-        raise NotImplementedError("You must implement get_token")
 
-
-class EmailInfoMixin(MailRecordMixin, SaltSaver):
+class EmailInfoMixin(MailRecordMixin):
     email_info_class: t.Type[EmailLoginInfo]
 
     tl: TimeLimit
@@ -74,9 +68,7 @@ class EmailInfoMixin(MailRecordMixin, SaltSaver):
     def check_could_send(self, email):
         re = self.get_mail_record(email)
         # TODO: if other user send email, the current user could not sign in.
-        if (re.last_time is None) or (
-            re.last_time + datetime.timedelta(minutes=self.tl.minutes) <= datetime.datetime.now(tz=timezone.utc)
-        ):
+        if (re.expired_time is None) or (re.expired_time <= datetime.datetime.now(tz=timezone.utc)):
             return True
         return False
 
@@ -99,13 +91,19 @@ class EmailInfoMixin(MailRecordMixin, SaltSaver):
         self.send_valid(email)
 
 
-class EmailValidateMixin(SaltSaver):
+class EmailValidateMixin(MailRecordMixin):
     tl: TimeLimit
 
     def verify_login_mail(self, request, token_v: str):
         m = token.TokenManager(self.tl.minutes)
         token_str = m.decrypt_token(token=token_v)
-        token_d = m.check_token(token_str, self.get_salt)
+        token_d = m.transform_token(token_str)
+
+        mr = self.get_mail_record(m.get_mail(token_d))
+        if mr.validated:
+            raise Exception("Already validated.")
+
+        token_d = m.check_token(token_d, lambda: mr.sault)
         if token_d is None:
             raise Exception("Invalid token.")
 
