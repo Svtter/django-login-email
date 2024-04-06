@@ -54,6 +54,11 @@ class MailRecordMixin(abc.ABC):
         """to save token in the database or somewhere."""
         raise NotImplementedError("You must implement save_token")
 
+    @abc.abstractmethod
+    def disable_token(self, token: token.TokenDict):
+        """Every token should only login once"""
+        raise NotImplementedError("")
+
 
 class EmailInfoMixin(MailRecordMixin):
     email_info_class: t.Type[EmailLoginInfo]
@@ -112,6 +117,7 @@ class EmailValidateMixin(MailRecordMixin):
         if not u.is_active:
             raise Exception("Inactive user, disallow login.")
 
+        self.disable_token(token=token_d)
         login(request, u)
 
 

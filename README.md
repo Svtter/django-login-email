@@ -20,6 +20,7 @@ List of the urls for exmaple project:
 - [x] limited of sending email. Using TimeLimt to set minutes.
 - [ ] The link could be used for Login once.
 - [ ] Ban IP to frequently ask to send mail.
+- [ ] Multiple user.
 - [ ] More easier and customizable login link.
 
 ## Future

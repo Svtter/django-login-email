@@ -29,6 +29,7 @@ class MailRecordModelMixin(email.EmailInfoMixin):
         e.save()
 
     def get_mail_record(self, mail: str) -> email.MailRecord:
+        """get mail record to validate the sault, and validated status."""
         # for easy to change. use a function.
         try:
             e = models.EmailLogin.objects.get(email=mail)
@@ -36,15 +37,24 @@ class MailRecordModelMixin(email.EmailInfoMixin):
         except models.EmailLogin.DoesNotExist:
             return email.MailRecord(email=mail, expired_time=None, validated=False, sault="")
 
+    def transform_timestamp(self, ts: int) -> datetime.datetime:
+        return datetime.datetime.fromtimestamp(ts, tz=datetime.timezone.utc)
+
     def save_token(self, token: token.TokenDict):
+        """When generate new token, should call this method."""
         try:
             models.EmailLogin.objects.filter(email=token["email"]).update(
-                sault=token["salt"], expired_time=token["expired_time"]
+                sault=token["salt"], expired_time=self.transform_timestamp(token["expired_time"])
             )
         except models.EmailLogin.DoesNotExist:
             models.EmailLogin.objects.create(
-                email=token["email"], sault=token["salt"], expired_time=token["expired_time"]
+                email=token["email"],
+                sault=token["salt"],
+                expired_time=self.transform_timestamp(token["expired_time"]),
             )
+
+    def disable_token(self, token: token.TokenDict):
+        models.EmailLogin.objects.filter(sault=token["salt"]).update(validated=True)
 
 
 class EmailLoginView(FormView, MailRecordModelMixin):
