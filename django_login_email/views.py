@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from . import forms
 from . import email
 from . import models
+from . import token
 
 # Create your views here.
 
@@ -20,13 +21,11 @@ class TimeLimit(email.TimeLimit):
 class MailRecordModelMixin(email.EmailInfoMixin):
     """Here is an example for MailRecord, using django model. You could implement yourself."""
 
-    def set_mail_record(self, mail: str):
-        models.EmailLogin.set_email_last_time(mail, datetime.datetime.now(tz=datetime.timezone.utc))
-
     def reset_mail(self, mail: str):
         # models.EmailLogin.objects.filter(email=mail).delete()
         e = models.EmailLogin.objects.get(email=mail)
         e.last_time = e.last_time - datetime.timedelta(minutes=self.tl.minutes)
+        e.validated = False
         e.save()
 
     def get_mail_record(self, mail: str) -> email.MailRecord:
@@ -36,6 +35,20 @@ class MailRecordModelMixin(email.EmailInfoMixin):
         except models.EmailLogin.DoesNotExist:
             return email.MailRecord(email=mail, last_time=None)
         return email.MailRecord(email=e.email, last_time=e.last_time)
+
+
+class ModelSaltSaver(email.SaltSaver):
+    def get_salt(self, email: str) -> str:
+        return models.EmailLogin.objects.get(email=email).sault
+
+    def save_token(self, token: token.TokenDict):
+        try:
+            obj = models.EmailLogin.objects.get(email=token["email"])
+            obj.objects.update(sault=token["salt"])
+        except models.EmailLogin.DoesNotExist:
+            obj = models.EmailLogin.objects.create(
+                email=token["email"], sault=token["salt"], last_time=token["expire_time"]
+            )
 
 
 class EmailLoginView(FormView, MailRecordModelMixin):

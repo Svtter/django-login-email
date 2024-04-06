@@ -5,6 +5,8 @@ from django.db import models
 
 class EmailLogin(models.Model):
     last_time = models.DateTimeField(auto_now_add=True, verbose_name="Last login request time")
+    validated = models.BooleanField(default=False, verbose_name="Login Token validated")
+    sault = models.CharField(max_length=100, verbose_name="Sault")
     email = models.EmailField(verbose_name="Email", unique=True, null=False)
 
     @classmethod
@@ -15,6 +17,7 @@ class EmailLogin(models.Model):
 
     def set_last_time(self, datetime):
         self.last_time = datetime
+        self.validated = False
         self.save()
 
     def __str__(self) -> str:

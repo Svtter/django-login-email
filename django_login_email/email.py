@@ -47,12 +47,21 @@ class MailRecordMixin(abc.ABC):
         # for easy to change. use a function.
         raise NotImplementedError("You must implement get_mail_record")
 
+
+class SaltSaver(abc.ABC):
+    """How to save token?"""
+
     @abc.abstractmethod
-    def set_mail_record(self, mail: str):
-        raise NotImplementedError("You must implement set_mail_record")
+    def save_token(self, token_str: token.TokenDict):
+        """to save token in the database or somewhere."""
+        raise NotImplementedError("You must implement save_token")
+
+    @abc.abstractmethod
+    def get_salt(self, email: str) -> str:
+        raise NotImplementedError("You must implement get_token")
 
 
-class EmailInfoMixin(MailRecordMixin):
+class EmailInfoMixin(MailRecordMixin, SaltSaver):
     email_info_class: t.Type[EmailLoginInfo]
 
     tl: TimeLimit
@@ -64,6 +73,7 @@ class EmailInfoMixin(MailRecordMixin):
 
     def check_could_send(self, email):
         re = self.get_mail_record(email)
+        # TODO: if other user send email, the current user could not sign in.
         if (re.last_time is None) or (
             re.last_time + datetime.timedelta(minutes=self.tl.minutes) <= datetime.datetime.now(tz=timezone.utc)
         ):
@@ -74,8 +84,8 @@ class EmailInfoMixin(MailRecordMixin):
         e = self.email_info_class()
         m = token.TokenManager(self.tl.minutes)
 
-        token_v = m.encrypt_mail(email)
-        e.set_token(token_v)
+        encrypt_token = m.encrypt_mail(email, self.save_token)
+        e.set_token(encrypt_token)
 
         msg = EmailMessage(e.subject, e.message, e.from_email, [email])
         msg.content_subtype = "html"
@@ -87,16 +97,15 @@ class EmailInfoMixin(MailRecordMixin):
             raise Exception(f"Cannot send. Wait {self.tl.minutes} minutes.")
 
         self.send_valid(email)
-        self.set_mail_record(email)
 
 
-class EmailValidateMixin(object):
+class EmailValidateMixin(SaltSaver):
     tl: TimeLimit
 
     def verify_login_mail(self, request, token_v: str):
         m = token.TokenManager(self.tl.minutes)
-        emailAndSalt = m.decrypt_token(token=token_v)
-        token_d = m.check_token(emailAndSalt)
+        token_str = m.decrypt_token(token=token_v)
+        token_d = m.check_token(token_str, self.get_salt)
         if token_d is None:
             raise Exception("Invalid token.")
 
