@@ -18,7 +18,7 @@ List of the urls for exmaple project:
 - [x] The developer could define their own `User` model.
 - [x] Time-limited of login link.
 - [x] limited of sending email. Using TimeLimt to set minutes.
-- [ ] The link could be used for Login once.
+- [x] The link could be used for Login once.
 - [ ] Ban IP to frequently ask to send mail.
 - [ ] Multiple user.
 - [ ] More easier and customizable login link.

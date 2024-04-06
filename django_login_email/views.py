@@ -83,7 +83,6 @@ class EmailLoginView(FormView, MailRecordModelMixin):
             print(e, form.cleaned_data["email"])
             return render(self.request, "login_email/success.html", {"form": form})
         except Exception as e:
-            raise Exception(e)
             print(e)
             return render(self.request, "login_email/error.html", {"error": e})
         return render(self.request, "login_email/success.html", {"form": form})
