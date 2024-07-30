@@ -1,6 +1,7 @@
 # Django Login Email
 
 [![PyPI](https://img.shields.io/pypi/v/django-login-email.svg)](https://pypi.python.org/pypi/django-login-email/)
+[![Documentation Status](https://readthedocs.org/projects/django-login-email/badge/?version=latest)](https://django-login-email.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/django-login-email/week)](https://pepy.tech/project/django-login-email)
 
 Allow user to login with only email.
 
