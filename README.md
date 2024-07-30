@@ -1,5 +1,7 @@
 # Django Login Email
 
+[![PyPI](https://img.shields.io/pypi/v/django-login-email.svg)](https://pypi.python.org/pypi/django-login-email/)
+
 Allow user to login with only email.
 
 ## Install
