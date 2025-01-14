@@ -6,6 +6,9 @@
 django-login-email documentation
 ================================
 
+
+``django-login-email`` is a Django app that provides a simple way to add email login to your Django app.
+
 Add your content using ``reStructuredText`` syntax. See the
 `reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
 documentation for details.

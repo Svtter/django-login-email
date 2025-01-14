@@ -23,10 +23,11 @@ build-backend = "pdm.backend"
 
 [dependency-groups]
 dev = [
-  "python-dotenv>=1.0.1",
-  "pytest-django>=4.8.0",
-  "ipython>=8.23.0",
-  "ruff>=0.9.1",
+    "python-dotenv>=1.0.1",
+    "pytest-django>=4.8.0",
+    "ipython>=8.23.0",
+    "ruff>=0.9.1",
+    "djlint>=1.36.4",
 ]
 
 [tool.ruff]
