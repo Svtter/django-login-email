@@ -57,9 +57,6 @@ class EmailLoginView(FormView, MailRecordModelMixin):
 class EmailVerifyView(TemplateView, email.EmailValidateMixin, MailRecordModelMixin):
   tl = TimeLimit()
 
-  def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-    raise Http404("Invalid Request.")
-
   def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
     token = request.GET.get("token", None)
     if token is None:
