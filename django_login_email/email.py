@@ -21,9 +21,9 @@ class EmailLoginInfo(object):
     from_email: str
 
     def __init__(self) -> None:
-        self.set_variables()
+        self.init_variables()
 
-    def set_variables(self):
+    def init_variables(self):
         raise NotImplementedError("You must set the subject and from_email.")
 
     def set_token(self, value):

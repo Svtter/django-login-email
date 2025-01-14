@@ -1,32 +1,30 @@
-[tool.poetry]
+[project]
 name = "django-login-email"
 version = "0.4.1"
 description = ""
-authors = ["svtter <svtter@qq.com>"]
+authors = [{ name = "svtter", email = "svtter@qq.com" }]
+dependencies = ["django>=5.0.4", "pycryptodome>=3.20.0"]
 readme = "README.md"
+requires-python = ">=3.10"
 
-[tool.poetry.dependencies]
-python = "^3.11"
-django = "^5.0.4"
-pycryptodome = "^3.20.0"
-
-
-[tool.poetry.group.dev.dependencies]
-python-dotenv = "^1.0.1"
-pytest-django = "^4.8.0"
-psycopg2 = "^2.9.9"
-ipython = "^8.23.0"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.urls]
+[project.urls]
 homepage = "https://github.com/Svtter/django-login-email"
 repository = "https://github.com/Svtter/django-login-email.git"
 changelog = "https://github.com/Svtter/django-login-email/blob/master/CHANGELOG.md"
 bugs = "https://github.com/Svtter/django-login-email/issues"
 # sponsor = "https://github.com/sponsors/svtter"
 
+[tool.pdm.dev-dependencies]
+dev = [
+  "python-dotenv>=1.0.1",
+  "pytest-django>=4.8.0",
+  "psycopg2>=2.9.9",
+  "ipython>=8.23.0",
+]
+
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "settings.settings"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
