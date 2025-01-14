@@ -23,5 +23,5 @@ from django_login_email.views import HomeView
 urlpatterns = [
   path("admin/", admin.site.urls),
   path("", HomeView.as_view(), name="home"),
-  path("account/", include("django_login_email.urls")),
+  path("account/", include("testapp.urls")),
 ]
