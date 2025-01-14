@@ -6,10 +6,16 @@ from django.shortcuts import render
 from django_login_email import forms
 
 
+def send_email():
+  pass
+
+
 def use_register(
   get_template: str,
   post_template: str,
 ) -> Callable[[HttpRequest], HttpResponse]:
+  """generate a email register function."""
+
   def register(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
       return render(request, get_template, {"form": forms.RegisterForm()})

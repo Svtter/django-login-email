@@ -1,5 +1,3 @@
-from django.views import render
-
 from django_login_email.views import use_register
 
 
