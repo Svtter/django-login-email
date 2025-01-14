@@ -13,11 +13,3 @@ def example_register(request):
 def example_verify(request):
   fn = register.use_verify(details="login_email/register_details.html")
   return fn(request)
-
-
-def example_register_details(request):
-  fn = register.use_register_details(
-    details="login_email/register_details.html",
-    register_form=forms.RegisterDetails,
-  )
-  return fn(request)

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django_login_email import email as e
 from django_login_email import views as v
 
-from .register import example_register, example_register_details, example_verify  # noqa
+from .register import example_register, example_verify  # noqa
 
 # Create your views here.
 
