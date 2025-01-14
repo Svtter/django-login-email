@@ -18,17 +18,15 @@ time_limit = 10
 
 def save_token(token_dict: dict):
   """When generate new token, should call this method."""
-  try:
-    models.EmailRegister.objects.filter(email=token_dict["email"]).update(
-      sault=token_dict["salt"],
-      expired_time=utils.transform_timestamp(token_dict["expired_time"]),
-    )
-  except models.EmailRegister.DoesNotExist:
-    models.EmailRegister.objects.create(
-      email=token_dict["email"],
-      sault=token_dict["salt"],
-      expired_time=utils.transform_timestamp(token_dict["expired_time"]),
-    )
+  logger.info(f"save token: {token_dict}")
+  models.EmailRegister.objects.update_or_create(
+    email=token_dict["email"],
+    defaults={
+      "sault": token_dict["salt"],
+      "expired_time": utils.transform_timestamp(token_dict["expired_time"]),
+      "validated": False,
+    },
+  )
 
 
 class MailSender(object):
@@ -38,7 +36,7 @@ class MailSender(object):
   def gen_mail_message(self, token_str: str, email: str) -> EmailMessage:
     return EmailMessage(
       subject="Meterhub Register",
-      body=f"Click <a href='http://127.0.0.1:8000/account/verify?token={token_str}'>Link</a>",
+      body=f"Click <a href='http://127.0.0.1:8000/account/register/verify?token={token_str}'>Link</a>",
       from_email="noreply@example.com",
       to=[email],
     )
@@ -104,7 +102,7 @@ class TokenValidator(object):
     if token_d is None:
       raise Exception("Invalid token.")
 
-    self.disable_token(token=token_d)
+    self.disable_token(token_d=token_d)
     u = User.objects.filter(email=token_d["email"])
     if u.exists():
       return u.first()
