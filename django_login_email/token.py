@@ -1,13 +1,13 @@
 # Handle email token
-import os
 import base64
+import datetime
 import json
-import urllib.parse
+import os
 import typing as t
+import urllib.parse
 
 from Crypto.Cipher import AES
 from django.conf import settings
-import datetime
 
 Token = str
 EmailAndSalt = str
@@ -17,71 +17,85 @@ TokenDict = t.TypedDict("TokenDict", {"email": Email, "expired_time": int, "salt
 
 
 class TokenGenerator(object):
-    def __init__(self, minutes: int) -> None:
-        self.minutes = minutes
+  """generate token by minutes"""
 
-    def get_expired_time(self) -> int:
-        return int((datetime.datetime.now() + datetime.timedelta(minutes=self.minutes)).timestamp())
+  def __init__(self, minutes: int) -> None:
+    self.minutes = minutes
 
-    def gen_salt(self, email) -> str:
-        return email + str(base64.b64encode(os.urandom(16)))
+  def get_expired_time(self) -> int:
+    return int(
+      (datetime.datetime.now() + datetime.timedelta(minutes=self.minutes)).timestamp()
+    )
 
-    def gen(self, email, save_token: t.Callable[[TokenDict], None]) -> str:
-        """call save_token to save token in database or somewhere"""
-        token: TokenDict = {
-            "email": email,
-            "expired_time": self.get_expired_time(),
-            "salt": self.gen_salt(email),
-        }
-        save_token(token)
-        token_str = json.dumps(token)
-        return token_str
+  def gen_salt(self, email) -> str:
+    return email + str(base64.b64encode(os.urandom(16)))
+
+  def gen(self, email, save_token: t.Callable[[TokenDict], None]) -> str:
+    """call save_token to save token in database or somewhere"""
+    token: TokenDict = {
+      "email": email,
+      "expired_time": self.get_expired_time(),
+      "salt": self.gen_salt(email),
+    }
+    save_token(token)
+    token_str = json.dumps(token)
+    return token_str
 
 
 class TokenManager(object):
-    key: bytes
-    generator: TokenGenerator
+  """manage the email generate token"""
 
-    def __init__(self, minutes: int) -> None:
-        self.key = settings.SECRET_KEY[:32].encode("utf-8")
-        self.generator: TokenGenerator = TokenGenerator(minutes)
+  key: bytes
+  generator: TokenGenerator
 
-    def transform_token(self, token_uncrypt: Token) -> TokenDict:
-        token_dict: TokenDict = json.loads(token_uncrypt)
-        return token_dict
+  def __init__(self, minutes: int) -> None:
+    self.key = settings.SECRET_KEY[:32].encode("utf-8")
+    self.generator: TokenGenerator = TokenGenerator(minutes)
 
-    def check_token(self, token_dict: TokenDict, get_salt: t.Callable[[], str]) -> t.Optional[TokenDict]:
-        """check salt and expire-time"""
-        if token_dict["salt"] == get_salt() and token_dict["expired_time"] > int(datetime.datetime.now().timestamp()):
-            return token_dict
-        return None
+  def transform_token(self, token_uncrypt: Token) -> TokenDict:
+    token_dict: TokenDict = json.loads(token_uncrypt)
+    return token_dict
 
-    def get_mail(self, token_uncrypt: TokenDict) -> Email:
-        return token_uncrypt["email"]
+  def check_token(
+    self, token_dict: TokenDict, get_salt: t.Callable[[], str]
+  ) -> t.Optional[TokenDict]:
+    """check salt and expire-time"""
+    if token_dict["salt"] == get_salt() and token_dict["expired_time"] > int(
+      datetime.datetime.now().timestamp()
+    ):
+      return token_dict
+    return None
 
-    def encrypt(self, plaintext, key):
-        cipher = AES.new(key, AES.MODE_EAX)
-        nonce = cipher.nonce
-        ciphertext, tag = cipher.encrypt_and_digest(plaintext)
-        return nonce + ciphertext + tag
+  def get_mail(self, token_uncrypt: TokenDict) -> Email:
+    return token_uncrypt["email"]
 
-    def decrypt(self, ciphertext, key):
-        nonce = ciphertext[:16]
-        tag = ciphertext[-16:]
-        ciphertext = ciphertext[16:-16]
-        cipher = AES.new(key, AES.MODE_EAX, nonce)
-        plaintext = cipher.decrypt_and_verify(ciphertext, tag)
-        return plaintext
+  def encrypt(self, plaintext, key):
+    cipher = AES.new(key, AES.MODE_EAX)
+    nonce = cipher.nonce
+    ciphertext, tag = cipher.encrypt_and_digest(plaintext)
+    return nonce + ciphertext + tag
 
-    def encrypt_mail(self, email: Email, save_token: t.Callable[[TokenDict], None]) -> str:
-        """email -> token -> base64 -> utf-8 -> urlquote"""
-        # add salt.
-        content = self.generator.gen(email, save_token)
-        content = content.encode("utf-8")
-        return urllib.parse.quote(base64.b64encode(self.encrypt(content, self.key)).decode("utf-8"))
+  def decrypt(self, ciphertext, key):
+    nonce = ciphertext[:16]
+    tag = ciphertext[-16:]
+    ciphertext = ciphertext[16:-16]
+    cipher = AES.new(key, AES.MODE_EAX, nonce)
+    plaintext = cipher.decrypt_and_verify(ciphertext, tag)
+    return plaintext
 
-    def decrypt_token(self, token: Token) -> str:
-        t = urllib.parse.unquote(token).encode("utf-8")
-        print(t)
-        t = base64.b64decode(t)
-        return self.decrypt(t, self.key).decode("utf-8")
+  def encrypt_mail(
+    self, email: Email, save_token: t.Callable[[TokenDict], None]
+  ) -> str:
+    """email -> token -> base64 -> utf-8 -> urlquote"""
+    # add salt.
+    content = self.generator.gen(email, save_token)
+    content = content.encode("utf-8")
+    return urllib.parse.quote(
+      base64.b64encode(self.encrypt(content, self.key)).decode("utf-8")
+    )
+
+  def decrypt_token(self, token: Token) -> str:
+    t = urllib.parse.unquote(token).encode("utf-8")
+    print(t)
+    t = base64.b64decode(t)
+    return self.decrypt(t, self.key).decode("utf-8")

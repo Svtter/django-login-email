@@ -3,11 +3,30 @@ from typing import Callable
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from django_login_email import forms
+from django_login_email import forms, models, token
+
+from .utils import transform_timestamp
+
+
+def save_token(token_dict):
+  """When generate new token, should call this method."""
+  try:
+    models.EmailLogin.objects.filter(email=token["email"]).update(
+      sault=token["salt"],
+      expired_time=transform_timestamp(token["expired_time"]),
+    )
+  except models.EmailLogin.DoesNotExist:
+    models.EmailLogin.objects.create(
+      email=token["email"],
+      sault=token["salt"],
+      expired_time=transform_timestamp(token["expired_time"]),
+    )
 
 
 def send_email():
-  pass
+  gen = token.TokenGenerator(10)
+  token_str = gen.gen("svtter@163.com", save_token)
+  print(token_str)
 
 
 def use_register(

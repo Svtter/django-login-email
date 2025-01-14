@@ -8,56 +8,16 @@ from django.urls import reverse
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 
-from .. import email, forms, models, token
-from .register import use_register
+from django_login_email import email, forms
+
+from .mixin import MailRecordModelMixin
+from .register import use_register  # noqa
 
 # Create your views here.
 
 
 class TimeLimit(email.TimeLimit):
   minutes = 10
-
-
-class MailRecordModelMixin(email.EmailInfoMixin):
-  """Here is an example for MailRecord, using django model. You could implement yourself."""
-
-  def reset_mail(self, mail: str):
-    # models.EmailLogin.objects.filter(email=mail).delete()
-    e = models.EmailLogin.objects.get(email=mail)
-    e.expired_time = e.expired_time - datetime.timedelta(minutes=self.tl.minutes)
-    e.validated = False
-    e.save()
-
-  def get_mail_record(self, mail: str) -> email.MailRecord:
-    """get mail record to validate the sault, and validated status."""
-    # for easy to change. use a function.
-    try:
-      e = models.EmailLogin.objects.get(email=mail)
-      return email.MailRecord(
-        email=e.email, expired_time=e.expired_time, validated=e.validated, sault=e.sault
-      )
-    except models.EmailLogin.DoesNotExist:
-      return email.MailRecord(email=mail, expired_time=None, validated=False, sault="")
-
-  def transform_timestamp(self, ts: int) -> datetime.datetime:
-    return datetime.datetime.fromtimestamp(ts, tz=datetime.timezone.utc)
-
-  def save_token(self, token: token.TokenDict):
-    """When generate new token, should call this method."""
-    try:
-      models.EmailLogin.objects.filter(email=token["email"]).update(
-        sault=token["salt"],
-        expired_time=self.transform_timestamp(token["expired_time"]),
-      )
-    except models.EmailLogin.DoesNotExist:
-      models.EmailLogin.objects.create(
-        email=token["email"],
-        sault=token["salt"],
-        expired_time=self.transform_timestamp(token["expired_time"]),
-      )
-
-  def disable_token(self, token: token.TokenDict):
-    models.EmailLogin.objects.filter(sault=token["salt"]).update(validated=True)
 
 
 class EmailLoginView(FormView, MailRecordModelMixin):
