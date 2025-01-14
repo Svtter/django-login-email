@@ -14,17 +14,17 @@ changelog = "https://github.com/Svtter/django-login-email/blob/master/CHANGELOG.
 bugs = "https://github.com/Svtter/django-login-email/issues"
 # sponsor = "https://github.com/sponsors/svtter"
 
-[tool.pdm.dev-dependencies]
-dev = [
-  "python-dotenv>=1.0.1",
-  "pytest-django>=4.8.0",
-  "psycopg2>=2.9.9",
-  "ipython>=8.23.0",
-]
-
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "settings.settings"
 
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
+
+[dependency-groups]
+dev = [
+    "python-dotenv>=1.0.1",
+    "pytest-django>=4.8.0",
+    "ipython>=8.23.0",
+    "ruff>=0.9.1",
+]
