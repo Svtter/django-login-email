@@ -81,6 +81,9 @@ def get_mail_record(token_d: dict):
 class TokenValidator(object):
   """Token validator."""
 
+  def __init__(self):
+    self.token_manager = token.TokenManager(time_limit)
+
   def disable_token(self, token_d: dict):
     """disable the token."""
     models.EmailRegister.objects.filter(email=token_d["email"]).update(
@@ -90,15 +93,14 @@ class TokenValidator(object):
 
   def validate_register_email(self, token_v: str) -> User:
     """validate the register details."""
-    m = token.TokenManager(time_limit)
-    token_str = m.decrypt_token(token=token_v)
-    token_d = m.transform_token(token_str)
+    token_str = self.token_manager.decrypt_token(token=token_v)
+    token_d = self.token_manager.transform_token(token_str)
 
     mr = get_mail_record(token_d)
     if mr.validated:
       raise Exception("Already validated.")
 
-    token_d = m.check_token(token_d, lambda: mr.sault)
+    token_d = self.token_manager.check_token(token_d, lambda: mr.sault)
     if token_d is None:
       raise Exception("Invalid token.")
 
@@ -115,7 +117,7 @@ class TokenValidator(object):
       return u
 
 
-def verify_register_token(
+def use_verify(
   success_url: str = "login_email:register_details",
 ) -> HttpResponse:
   """
@@ -136,7 +138,7 @@ def verify_register_token(
   return verify_token
 
 
-def register_details(
+def use_register_details(
   details: str = "login_email/register_details.html",
   register_form=forms.RegisterDetails,
 ) -> HttpResponse:

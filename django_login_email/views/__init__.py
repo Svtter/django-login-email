@@ -9,10 +9,12 @@ from django.views.generic import TemplateView
 
 from django_login_email import email
 
-from . import limit
+from . import (
+  limit,
+  register,  # noqa
+)
 from .login import EmailLoginView  # noqa
 from .mixin import MailRecordModelMixin
-from .register import use_register  # noqa
 
 logger = logging.getLogger(__name__)
 
@@ -50,4 +52,4 @@ class HomeView(TemplateView):
     if not self.request.user.is_anonymous and self.request.user.is_authenticated:
       return super().get(request, *args, **kwargs)
     else:
-      return redirect("login")
+      return redirect("login_email:login")
