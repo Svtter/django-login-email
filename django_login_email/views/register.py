@@ -116,7 +116,8 @@ class TokenValidator(object):
 
 
 def use_verify(
-  success_url: str = "login_email:register_details",
+  details: str = "login_email/register_details.html",
+  register_form=forms.RegisterDetails,
 ) -> HttpResponse:
   """
   Verify the register token.
@@ -128,10 +129,15 @@ def use_verify(
     if request.method == "GET":
       try:
         u = tv.validate_register_email(request.GET.get("token"))
-        login(request, u)
-        return redirect(success_url)
+        logger.info(f"user: {u.email} logined.")
+        if u.is_active:
+          return HttpResponse(status=200, content="Already activated.")
+        else:
+          return render(request, details, {"form": register_form()})
+
       except Exception as e:
-        return HttpResponse(status=404, content=str(e))
+        logger.error(f"verify token error: {e}")
+        return HttpResponse(status=403, content=str(e))
 
   return verify_token
 
@@ -144,17 +150,8 @@ def use_register_details(
 
   def fn(request: HttpRequest) -> HttpResponse:
     """validate the register details."""
-    if request.method == "GET":
-      try:
-        if request.user.is_authenticated and not request.user.is_active:
-          return render(request, details, {"form": register_form()})
-        else:
-          return HttpResponse(status=404, content="Invalid token.")
-      except Exception as e:
-        messages.error(request, str(e))
-        return render(request, details, {"form": register_form()})
 
-    elif request.method == "POST":
+    if request.method == "POST":
       form = register_form(request.POST)
       if form.is_valid():
         tv.validate_register_email(form.cleaned_data["token"])
