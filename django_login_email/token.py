@@ -70,13 +70,13 @@ class TokenManager(object):
     """Read the email from token"""
     return token_uncrypt["email"]
 
-  def encrypt(self, plaintext, key):
+  def _encrypt(self, plaintext, key):
     cipher = AES.new(key, AES.MODE_EAX)
     nonce = cipher.nonce
     ciphertext, tag = cipher.encrypt_and_digest(plaintext)
     return nonce + ciphertext + tag
 
-  def decrypt(self, ciphertext, key):
+  def _decrypt(self, ciphertext, key):
     nonce = ciphertext[:16]
     tag = ciphertext[-16:]
     ciphertext = ciphertext[16:-16]
@@ -92,11 +92,11 @@ class TokenManager(object):
     content = self.generator.gen(email, save_token)
     content = content.encode("utf-8")
     return urllib.parse.quote(
-      base64.b64encode(self.encrypt(content, self.key)).decode("utf-8")
+      base64.b64encode(self._encrypt(content, self.key)).decode("utf-8")
     )
 
   def decrypt_token(self, token: Token) -> str:
     t = urllib.parse.unquote(token).encode("utf-8")
     print(t)
     t = base64.b64decode(t)
-    return self.decrypt(t, self.key).decode("utf-8")
+    return self._decrypt(t, self.key).decode("utf-8")
