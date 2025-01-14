@@ -26,7 +26,6 @@ class RegisterForm(forms.Form):
 class RegisterDetails(forms.Form):
   """Just check the register details."""
 
-  email = forms.EmailField(label="email")
   user = forms.CharField(label="user")
 
   def save(self):
