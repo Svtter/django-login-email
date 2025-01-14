@@ -142,7 +142,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # You could test this by using https://mailtrap.io/
-EMAIL_HOST = "sandbox.smtp.mailtrap.io"
-EMAIL_HOST_USER = "f9c15aa2704df2"
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-EMAIL_PORT = "2525"
+# EMAIL_HOST = "sandbox.smtp.mailtrap.io"
+# EMAIL_HOST_USER = "f9c15aa2704df2"
+# EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+# EMAIL_PORT = "2525"
+
+EMAIL_HOST = "localhost"
+EMAIL_HOST_USER = "user"
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "password")
+EMAIL_PORT = "1025"
