@@ -21,16 +21,3 @@ class RegisterForm(forms.Form):
       self.add_error("email", "User already registered.")
       return False
     return res
-
-
-class RegisterDetails(forms.Form):
-  """Just check the register details."""
-
-  user = forms.CharField(label="user")
-
-  def save(self):
-    """save with is_active=True."""
-    User = get_user_model()
-    u = User(email=self.cleaned_data["email"], username=self.cleaned_data["user"])
-    u.is_active = True
-    u.save()

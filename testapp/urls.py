@@ -10,5 +10,4 @@ urlpatterns = [
   path("logout", v.LogoutView.as_view(), name="logout"),
   path("register", v.example_register, name="register"),
   path("register/verify", v.example_verify, name="verify"),
-  path("register/details", v.example_register_details, name="register_details"),
 ]

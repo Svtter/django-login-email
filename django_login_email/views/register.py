@@ -96,7 +96,7 @@ class TokenValidator(object):
 
     mr = get_mail_record(token_d)
     if mr.validated:
-      raise Exception("Already validated.")
+      raise Exception("Token already validated.")
 
     token_d = self.token_manager.check_token(token_d, lambda: mr.sault)
     if token_d is None:
@@ -105,19 +105,17 @@ class TokenValidator(object):
     self.disable_token(token_d=token_d)
     u = User.objects.filter(email=token_d["email"])
     if u.exists():
-      return u.first()
-    else:
-      u = User.objects.create_user(
-        username=token_d["email"],  # using email as username.
-        email=token_d["email"],
-        is_active=False,
-      )
-      return u
+      raise Exception("User already exists.")
+
+    u = User.objects.create_user(
+      username=token_d["email"],  # using email as username.
+      email=token_d["email"],
+    )
+    return u
 
 
 def use_verify(
   details: str = "login_email/register_details.html",
-  register_form=forms.RegisterDetails,
 ) -> HttpResponse:
   """
   Verify the register token.
@@ -129,35 +127,12 @@ def use_verify(
     if request.method == "GET":
       try:
         u = tv.validate_register_email(request.GET.get("token"))
+        login(request, u)
         logger.info(f"user: {u.email} logined.")
-        if u.is_active:
-          return HttpResponse(status=200, content="Already activated.")
-        else:
-          return render(request, details, {"form": register_form()})
+        return render(request, details)
 
       except Exception as e:
         logger.error(f"verify token error: {e}")
         return HttpResponse(status=403, content=str(e))
 
   return verify_token
-
-
-def use_register_details(
-  details: str = "login_email/register_details.html",
-  register_form=forms.RegisterDetails,
-) -> HttpResponse:
-  tv = TokenValidator()
-
-  def fn(request: HttpRequest) -> HttpResponse:
-    """validate the register details."""
-
-    if request.method == "POST":
-      form = register_form(request.POST)
-      if form.is_valid():
-        tv.validate_register_email(form.cleaned_data["token"])
-        form.save()
-        return render(request, details, {"form": form})
-      else:
-        return render(request, details, {"form": form})
-
-  return fn
