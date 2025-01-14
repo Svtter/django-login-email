@@ -1,4 +1,7 @@
 import datetime
+
+# Create your views here.
+import logging
 from typing import Any
 
 from django.contrib.auth import get_user_model
@@ -13,7 +16,7 @@ from django_login_email import email, forms
 from .mixin import MailRecordModelMixin
 from .register import use_register  # noqa
 
-# Create your views here.
+logger = logging.getLogger(__name__)
 
 
 class TimeLimit(email.TimeLimit):
@@ -41,12 +44,12 @@ class EmailLoginView(FormView, MailRecordModelMixin):
     User = get_user_model()
     try:
       self.send_login_mail(form.cleaned_data["email"])
-    except User.DoesNotExist as e:
+    except User.DoesNotExist:
       # ignore user missing problem.
-      print(e, form.cleaned_data["email"])
+      logger.warning(f"user {form.cleaned_data['email']} does not exist")
       return render(self.request, "login_email/success.html", {"form": form})
     except Exception as e:
-      print(e)
+      logger.error(e)
       return render(self.request, "login_email/error.html", {"error": e})
     return render(self.request, "login_email/success.html", {"form": form})
 
@@ -64,8 +67,7 @@ class EmailVerifyView(TemplateView, email.EmailValidateMixin, MailRecordModelMix
     try:
       self.verify_login_mail(request=request, token_v=token)
     except Exception as e:
-      # TODO: log the error
-      print(e)
+      logger.error(e)
       raise Http404("Invalid Request")
     return redirect(self.get_success_url())
 
