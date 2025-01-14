@@ -152,3 +152,41 @@ EMAIL_HOST = "localhost"
 EMAIL_HOST_USER = "user"
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "password")
 EMAIL_PORT = "1025"
+
+# Logging configuration
+LOGGING = {
+  "version": 1,
+  "disable_existing_loggers": False,
+  "formatters": {
+    "verbose": {
+      "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+      "style": "{",
+    },
+    "simple": {
+      "format": "{levelname} {message}",
+      "style": "{",
+    },
+  },
+  "handlers": {
+    "console": {
+      "class": "logging.StreamHandler",
+      "formatter": "verbose",
+    },
+    "file": {
+      "class": "logging.FileHandler",
+      "filename": "debug.log",
+      "formatter": "verbose",
+    },
+  },
+  "root": {
+    "handlers": ["console", "file"],
+    "level": "INFO",
+  },
+  "loggers": {
+    "django": {
+      "handlers": ["console", "file"],
+      "level": "INFO",
+      "propagate": True,
+    },
+  },
+}
