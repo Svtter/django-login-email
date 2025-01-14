@@ -69,13 +69,13 @@ class EmailVerifyView(TemplateView, email.EmailValidateMixin, MailRecordModelMix
     return redirect(self.get_success_url())
 
   def get_success_url(self):
-    return reverse("home")
+    return reverse("login_email:home")
 
 
 class EmailLogoutView(TemplateView, email.EmailLogoutMixin):
   def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
     self.logout(request=request)
-    return redirect("login")
+    return redirect("login_email:login")
 
 
 class HomeView(TemplateView):
@@ -85,4 +85,4 @@ class HomeView(TemplateView):
     if not self.request.user.is_anonymous and self.request.user.is_authenticated:
       return super().get(request, *args, **kwargs)
     else:
-      return redirect("login")
+      return redirect("login_email:login")

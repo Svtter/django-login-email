@@ -67,6 +67,7 @@ class TokenManager(object):
     return None
 
   def get_mail(self, token_uncrypt: TokenDict) -> Email:
+    """Read the email from token"""
     return token_uncrypt["email"]
 
   def encrypt(self, plaintext, key):

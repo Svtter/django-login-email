@@ -50,7 +50,7 @@ class MailRecord(object):
 class MailRecordMixin(abc.ABC):
   @abc.abstractmethod
   def get_mail_record(self, mail: str) -> MailRecord:
-    # for easy to change. use a function.
+    """Get the mail record from the database."""
     raise NotImplementedError("You must implement get_mail_record")
 
   @abc.abstractmethod
