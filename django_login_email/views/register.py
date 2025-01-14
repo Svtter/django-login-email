@@ -115,7 +115,7 @@ class TokenValidator(object):
 
 
 def use_verify(
-  details: str = "login_email/register_details.html",
+  success_url: str = "home",
 ) -> HttpResponse:
   """
   Verify the register token.
@@ -129,7 +129,7 @@ def use_verify(
         u = tv.validate_register_email(request.GET.get("token"))
         login(request, u)
         logger.info(f"user: {u.email} logined.")
-        return render(request, details)
+        return redirect(success_url)
 
       except Exception as e:
         logger.error(f"verify token error: {e}")

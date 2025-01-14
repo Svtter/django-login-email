@@ -1,4 +1,3 @@
-from django_login_email import forms
 from django_login_email.views import register
 
 
@@ -11,5 +10,5 @@ def example_register(request):
 
 
 def example_verify(request):
-  fn = register.use_verify(details="login_email/register_details.html")
+  fn = register.use_verify(success_url="home")
   return fn(request)
