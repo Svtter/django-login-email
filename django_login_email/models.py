@@ -7,9 +7,11 @@ class EmailRegister(models.Model):
   """Record the token for register."""
 
   expired_time = models.DateTimeField(
-    auto_now_add=True, verbose_name="Last login request time"
+    auto_now_add=True, verbose_name="Last register request time"
   )
-  validated = models.BooleanField(default=False, verbose_name="Login Token validated")
+  validated = models.BooleanField(
+    default=False, verbose_name="Register Token validated"
+  )
   sault = models.CharField(max_length=100, verbose_name="Sault")
   email = models.EmailField(verbose_name="Email", unique=True, null=False)
 
