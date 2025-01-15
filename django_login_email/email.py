@@ -8,7 +8,7 @@ from datetime import timezone
 from django.contrib.auth import get_user_model, login, logout
 from django.core.mail import EmailMessage
 
-from . import token
+from . import errors, token
 
 
 class EmailInfo(object):
@@ -168,18 +168,18 @@ class EmailVerifyMixin(MailRecordAPI):
 
     mr = self.get_mail_record(m.get_mail(token_d))
     if mr.validated:
-      raise Exception("Already validated.")
+      raise errors.ValidatedError("Token already validated.")
 
     token_d = m.check_token(token_d, lambda: mr.sault)
     if token_d is None:
-      raise Exception("Invalid token.")
+      raise errors.TokenError("Invalid token.")
 
     User = get_user_model()
     u = User.objects.filter(email=m.get_mail(token_d)).first()
     if not u:
       # if user not exist, create a new user.
       # support register by email.
-      u = User.objects.create(email=m.get_mail(token_d))
+      u = User.objects.create(username=m.get_mail(token_d), email=m.get_mail(token_d))
 
     if not u.is_active:
       raise Exception("Inactive user, disallow login.")

@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.urls import reverse
 
 from django_login_email import email as e
 from django_login_email import views as v
@@ -14,7 +15,8 @@ class LoginView(v.EmailLoginView):
 
 
 class VerifyView(v.EmailVerifyView):
-  pass
+  def get_success_url(self):
+    return reverse("home")
 
 
 class LogoutView(v.EmailLogoutView):

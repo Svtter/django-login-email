@@ -3,11 +3,11 @@ import logging
 from typing import Any
 
 from django.http import Http404, HttpRequest, HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import TemplateView
 
-from django_login_email import email
+from django_login_email import email, errors
 
 from . import limit
 from .login import EmailLoginView  # noqa
@@ -27,6 +27,8 @@ class EmailVerifyView(TemplateView, email.EmailVerifyMixin, MailRecordModelMixin
       raise Http404("Invalid Request")
     try:
       self.verify_login_mail(request=request, token_v=token)
+    except errors.ValidatedError as e:
+      return render(self.request, "login_email/error.html", {"error": e})
     except Exception as e:
       logger.error(e)
       raise Http404("Invalid Request")
