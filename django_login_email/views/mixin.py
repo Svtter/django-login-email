@@ -32,11 +32,12 @@ class MailRecordModelMixin(email.EmailFunc):
   def save_token(self, token: token.TokenDict):
     """When generate new token, should call this method."""
     try:
-      models.EmailRecord.objects.get(email=token["email"]).update(
-        sault=token["salt"],
-        expired_time=self.transform_timestamp(token["expired_time"]),
-        mail_type=token["mail_type"],
-      )
+      mail = models.EmailRecord.objects.get(email=token["email"])
+      mail.sault = token["salt"]
+      mail.expired_time = self.transform_timestamp(token["expired_time"])
+      mail.mail_type = token["mail_type"]
+      mail.save()
+
     except models.EmailRecord.DoesNotExist:
       models.EmailRecord.objects.create(
         email=token["email"],
