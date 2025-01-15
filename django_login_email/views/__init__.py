@@ -20,6 +20,7 @@ class EmailVerifyView(TemplateView, email.EmailVerifyMixin, MailRecordModelMixin
   """verify token in url"""
 
   tl = limit.LoginTimeLimit()
+  error_template: str = "login_email/error.html"
 
   def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
     token = request.GET.get("token", None)
@@ -28,7 +29,7 @@ class EmailVerifyView(TemplateView, email.EmailVerifyMixin, MailRecordModelMixin
     try:
       self.verify_login_mail(request=request, token_v=token)
     except errors.ValidatedError as e:
-      return render(self.request, "login_email/error.html", {"error": e})
+      return render(self.request, self.error_template, {"error": e})
     except Exception as e:
       logger.error(e)
       raise Http404("Invalid Request")
@@ -39,9 +40,11 @@ class EmailVerifyView(TemplateView, email.EmailVerifyMixin, MailRecordModelMixin
 
 
 class EmailLogoutView(TemplateView, email.EmailLogoutMixin):
+  login_url: str = "login_email:login"
+
   def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
     self.logout(request=request)
-    return redirect("login_email:login")
+    return redirect(self.login_url)
 
 
 class HomeView(TemplateView):
