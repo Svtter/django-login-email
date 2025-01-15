@@ -13,7 +13,9 @@ Token = str
 EmailAndSalt = str
 Email = str
 
-TokenDict = t.TypedDict("TokenDict", {"email": Email, "expired_time": int, "salt": str})
+TokenDict = t.TypedDict(
+  "TokenDict", {"email": Email, "expired_time": int, "salt": str, "mail_type": str}
+)
 
 
 class TokenGenerator(object):
@@ -30,12 +32,15 @@ class TokenGenerator(object):
   def gen_salt(self, email) -> str:
     return email + str(base64.b64encode(os.urandom(16)))
 
-  def gen(self, email, save_token: t.Callable[[TokenDict], None]) -> str:
+  def gen(
+    self, email, mail_type: str, save_token: t.Callable[[TokenDict], None]
+  ) -> str:
     """call save_token to save token in database or somewhere"""
     token: TokenDict = {
       "email": email,
       "expired_time": self.get_expired_time(),
       "salt": self.gen_salt(email),
+      "mail_type": mail_type,
     }
     save_token(token)
     token_str = json.dumps(token)
@@ -85,11 +90,11 @@ class TokenManager(object):
     return plaintext
 
   def encrypt_mail(
-    self, email: Email, save_token: t.Callable[[TokenDict], None]
+    self, email: Email, mail_type: str, save_token: t.Callable[[TokenDict], None]
   ) -> str:
     """email -> token -> base64 -> utf-8 -> urlquote"""
     # add salt.
-    content = self.generator.gen(email, save_token)
+    content = self.generator.gen(email, mail_type, save_token)
     content = content.encode("utf-8")
     return urllib.parse.quote(
       base64.b64encode(self._encrypt(content, self.key)).decode("utf-8")
@@ -97,6 +102,5 @@ class TokenManager(object):
 
   def decrypt_token(self, token: Token) -> str:
     t = urllib.parse.unquote(token).encode("utf-8")
-    print(t)
     t = base64.b64decode(t)
     return self._decrypt(t, self.key).decode("utf-8")

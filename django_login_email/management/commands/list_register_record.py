@@ -5,4 +5,4 @@ from django_login_email import models
 
 class Command(BaseCommand):
   def handle(self, *args, **kwargs):
-    print(models.EmailRegister.objects.all())
+    print(models.EmailRecord.objects.all())

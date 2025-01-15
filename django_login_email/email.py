@@ -90,7 +90,7 @@ class EmailInfoMixin(MailRecordMixin):
     e = self.email_info_class()
     m = token.TokenManager(self.tl.minutes)
 
-    encrypt_token = m.encrypt_mail(email, self.save_token)
+    encrypt_token = m.encrypt_mail(email, "login", self.save_token)
     e.set_token(encrypt_token)
 
     msg = EmailMessage(e.subject, e.message, e.from_email, [email])
@@ -106,6 +106,8 @@ class EmailInfoMixin(MailRecordMixin):
 
 
 class EmailValidateMixin(MailRecordMixin):
+  """verify the token in url"""
+
   tl: TimeLimit
 
   def verify_login_mail(self, request, token_v: str):

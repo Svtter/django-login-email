@@ -19,7 +19,7 @@ time_limit = 10
 def save_token(token_dict: dict):
   """When generate new token, should call this method."""
   logger.info(f"save token: {token_dict}")
-  models.EmailRegister.objects.update_or_create(
+  models.EmailRecord.objects.update_or_create(
     email=token_dict["email"],
     defaults={
       "sault": token_dict["salt"],
@@ -42,7 +42,7 @@ class MailSender(object):
     )
 
   def send_email(self, email: str) -> str:
-    url = self.token_manager.encrypt_mail(email, save_token)
+    url = self.token_manager.encrypt_mail(email, "register", save_token)
     mail = self.gen_mail_message(url, email)
     mail.send()
     return url
@@ -73,7 +73,7 @@ def use_register(
 
 def get_mail_record(token_d: dict):
   """get the mail record."""
-  return models.EmailRegister.objects.get(email=token_d["email"])
+  return models.EmailRecord.objects.get(email=token_d["email"])
 
 
 class TokenValidator(object):
@@ -84,7 +84,7 @@ class TokenValidator(object):
 
   def disable_token(self, token_d: dict):
     """disable the token."""
-    models.EmailRegister.objects.filter(email=token_d["email"]).update(
+    models.EmailRecord.objects.filter(email=token_d["email"]).update(
       validated=True,
       expired_time=utils.transform_timestamp(token_d["expired_time"]),
     )
