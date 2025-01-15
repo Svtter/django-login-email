@@ -22,8 +22,8 @@ List of the urls for exmaple project:
 - [x] Time-limited of login link.
 - [x] limited of sending email. Using TimeLimt to set minutes.
 - [x] The link could be used for Login once.
-- [ ] Register new user.
-- [ ] Support multiple user.
+- [x] Register new user.
+- [x] Support multiple user.
 - [ ] Ban the IP to send mail frequently without login.
 - [ ] Enable 2FA.
 - [ ] More easier and customizable login link.
@@ -44,25 +44,30 @@ INSTALLED_APP = [
 
 ```python
 from django.shortcuts import render
-from django_login_email import views as v
+from django.urls import reverse
+
 from django_login_email import email as e
+from django_login_email import views as v
 
 # Create your views here.
 
-
-class MyInfo(e.EmailLoginInfo):
-    def set_variables(self):
-        self.subject = "Login request from meterhub"
-        self.welcome_text = "Welcome to meterhub! Please click the link below to login.<br>"
-        self.from_email = "sandbox.smtp.mailtrap.io"
+loginInfo, registerInfo = e.get_info_class("meterhub")
 
 
 class LoginView(v.EmailLoginView):
-    email_info_class = MyInfo
+  login_info_class = loginInfo
+  register_info_class = registerInfo
 
 
 class VerifyView(v.EmailVerifyView):
-    pass
+  def get_success_url(self):
+    return reverse("home")
+
+
+class LogoutView(v.EmailLogoutView):
+  pass
+
+
 
 ```
 
