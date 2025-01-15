@@ -119,6 +119,9 @@ class EmailFunc(MailRecordAPI):
       return True
     return False
 
+  def get_token_manager(self) -> token.TokenManager:
+    return token.TokenManager(self.tl.minutes)
+
   def send_valid(self, email: str, mail_type: str):
     """send login/register mail."""
     if mail_type == "login":
@@ -128,8 +131,7 @@ class EmailFunc(MailRecordAPI):
     else:
       raise ValueError(f"Invalid mail type: {mail_type}")
 
-    m = token.TokenManager(self.tl.minutes)
-
+    m = self.get_token_manager()
     encrypt_token = m.encrypt_mail(email, mail_type, self.save_token)
     e.set_token(encrypt_token)
 
@@ -159,11 +161,7 @@ class EmailVerifyMixin(MailRecordAPI):
 
   tl: TimeLimit
 
-  def verify_login_mail(self, request, token_v: str):
-    """
-    verify the login mail.
-    if user not exist, create a new user.
-    """
+  def verify_token(self, token_v: str):
     m = token.TokenManager(self.tl.minutes)
     token_str = m.decrypt_token(token=token_v)
     token_d = m.transform_token(token_str)
@@ -187,6 +185,14 @@ class EmailVerifyMixin(MailRecordAPI):
       raise Exception("Inactive user, disallow login.")
 
     self.disable_token(token=token_d)
+    return u
+
+  def verify_login_mail(self, request, token_v: str):
+    """
+    verify the login mail.
+    if user not exist, create a new user.
+    """
+    u = self.verify_token(token_v=token_v)
     login(request, u)
 
 
