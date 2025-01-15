@@ -1,11 +1,15 @@
 [project]
 name = "django-login-email"
-version = "0.4.1"
+dynamic = ["version"]
 description = "A django app for login with email."
 authors = [{ name = "svtter", email = "svtter@qq.com" }]
 dependencies = ["django>=5.0.4", "pycryptodome>=3.20.0"]
 readme = "README.md"
 requires-python = ">=3.10"
+
+[tool.pdm.version]
+source = "file"
+path = "django_login_email/__init__.py"
 
 [project.urls]
 homepage = "https://github.com/Svtter/django-login-email"
