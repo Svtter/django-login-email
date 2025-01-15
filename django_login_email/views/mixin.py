@@ -4,13 +4,13 @@ from .. import email, models, token
 from . import utils
 
 
-class MailRecordModelMixin(email.EmailInfoMixin):
+class MailRecordModelMixin(email.EmailFunc):
   """Here is an example for MailRecord, using django model. You could implement yourself."""
 
   def reset_mail(self, mail: str):
     """reset mail token expired time."""
     # models.EmailLogin.objects.filter(email=mail).delete()
-    e = models.EmailLogin.objects.get(email=mail)
+    e = models.EmailRecord.objects.get(email=mail)
     e.expired_time = e.expired_time - datetime.timedelta(minutes=self.tl.minutes)
     e.validated = False
     e.save()
@@ -19,11 +19,11 @@ class MailRecordModelMixin(email.EmailInfoMixin):
     """get mail record to validate the sault, and validated status."""
     # for easy to change. use a function.
     try:
-      e = models.EmailLogin.objects.get(email=mail)
+      e = models.EmailRecord.objects.get(email=mail)
       return email.MailRecord(
         email=e.email, expired_time=e.expired_time, validated=e.validated, sault=e.sault
       )
-    except models.EmailLogin.DoesNotExist:
+    except models.EmailRecord.DoesNotExist:
       return email.MailRecord(email=mail, expired_time=None, validated=False, sault="")
 
   def transform_timestamp(self, ts: int) -> datetime.datetime:
@@ -32,16 +32,18 @@ class MailRecordModelMixin(email.EmailInfoMixin):
   def save_token(self, token: token.TokenDict):
     """When generate new token, should call this method."""
     try:
-      models.EmailLogin.objects.filter(email=token["email"]).update(
+      models.EmailRecord.objects.get(email=token["email"]).update(
         sault=token["salt"],
         expired_time=self.transform_timestamp(token["expired_time"]),
+        mail_type=token["mail_type"],
       )
-    except models.EmailLogin.DoesNotExist:
-      models.EmailLogin.objects.create(
+    except models.EmailRecord.DoesNotExist:
+      models.EmailRecord.objects.create(
         email=token["email"],
         sault=token["salt"],
         expired_time=self.transform_timestamp(token["expired_time"]),
+        mail_type=token["mail_type"],
       )
 
   def disable_token(self, token: token.TokenDict):
-    models.EmailLogin.objects.filter(sault=token["salt"]).update(validated=True)
+    models.EmailRecord.objects.filter(sault=token["salt"]).update(validated=True)

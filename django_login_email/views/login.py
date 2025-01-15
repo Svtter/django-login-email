@@ -2,7 +2,6 @@
 import logging
 from typing import Any
 
-from django.contrib.auth import get_user_model
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.generic.edit import FormView
@@ -20,7 +19,10 @@ class EmailLoginView(FormView, MailRecordModelMixin):
 
   template_name = "login_email/login.html"
   form_class = forms.LoginForm
-  email_info_class = email.EmailLoginInfo
+
+  login_info_class = email.EmailLoginInfo
+  register_info_class = email.EmailRegisterInfo
+
   tl = limit.LoginTimeLimit()
 
   def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
@@ -35,13 +37,9 @@ class EmailLoginView(FormView, MailRecordModelMixin):
     if self.request.user.is_authenticated:
       return redirect("home")
 
-    User = get_user_model()
     try:
+      # send login mail. If user not exist, send register mail.
       self.send_login_mail(form.cleaned_data["email"])
-    except User.DoesNotExist:
-      # ignore user missing problem.
-      logger.warning(f"user {form.cleaned_data['email']} does not exist")
-      return render(self.request, "login_email/success.html", {"form": form})
     except Exception as e:
       logger.error(e)
       return render(self.request, "login_email/error.html", {"error": e})

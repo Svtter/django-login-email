@@ -9,9 +9,7 @@ class EmailRecord(models.Model):
   expired_time = models.DateTimeField(
     auto_now_add=True, verbose_name="Last register request time"
   )
-  validated = models.BooleanField(
-    default=False, verbose_name="Register Token validated"
-  )
+  validated = models.BooleanField(default=False, verbose_name="Register Token validated")
   mail_type = models.CharField(max_length=100, verbose_name="Mail type")
   sault = models.CharField(max_length=100, verbose_name="Sault")
   email = models.EmailField(verbose_name="Email", unique=True, null=False)

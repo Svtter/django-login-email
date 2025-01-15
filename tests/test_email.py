@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from django_login_email.email import EmailInfoMixin, MailRecord, TimeLimit
+from django_login_email.email import EmailFunc, MailRecord, TimeLimit
 from django_login_email.token import TokenDict
 
 sample_mail = "svtter@163.com"
@@ -12,7 +12,7 @@ class MyTimeLit(TimeLimit):
   minutes = 10
 
 
-class Mixin(EmailInfoMixin):
+class Mixin(EmailFunc):
   tl = MyTimeLit()
 
   def get_mail_record(self, mail: str) -> MailRecord:
@@ -43,7 +43,7 @@ def test_mixin():
   assert e.check_could_send(email=sample_mail)
 
 
-class Mixin2(EmailInfoMixin):
+class Mixin2(EmailFunc):
   tl = MyTimeLit()
 
   def get_mail_record(self, mail: str) -> MailRecord:

@@ -3,20 +3,14 @@ from django.shortcuts import render
 from django_login_email import email as e
 from django_login_email import views as v
 
-from .register import example_register, example_verify  # noqa
-
 # Create your views here.
 
-
-class MyInfo(e.EmailLoginInfo):
-  def init_variables(self):
-    self.subject = "Login request from meterhub"
-    self.welcome_text = "Welcome to meterhub! Please click the link below to login.<br>"
-    self.from_email = "sandbox.smtp.mailtrap.io"
+loginInfo, registerInfo = e.get_info_class("meterhub")
 
 
 class LoginView(v.EmailLoginView):
-  email_info_class = MyInfo
+  login_info_class = loginInfo
+  register_info_class = registerInfo
 
 
 class VerifyView(v.EmailVerifyView):

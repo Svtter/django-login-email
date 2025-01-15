@@ -9,10 +9,7 @@ from django.views.generic import TemplateView
 
 from django_login_email import email
 
-from . import (
-  limit,
-  register,  # noqa
-)
+from . import limit
 from .login import EmailLoginView  # noqa
 from .mixin import MailRecordModelMixin
 

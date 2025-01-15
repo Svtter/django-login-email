@@ -21,9 +21,7 @@ class EmailInfo(object):
   system_name: str
 
   url: str = "http://127.0.0.1:8000/account/verify?token="
-  login_message: string.Template = string.Template(
-    'Click <a href="$url$token">Link</a>'
-  )
+  login_message: string.Template = string.Template('Click <a href="$url$token">Link</a>')
 
   def set_token(self, value):
     self.message = self.welcome_text + self.login_message.substitute(
@@ -35,10 +33,8 @@ class EmailLoginInfo(EmailInfo):
   """Email info for login."""
 
   def __init__(self):
-    self.subject = (
-      f"Welcome to {self.system_name}! Please click the link below to login."
-    )
-    self.from_email = "svtter@163.com"
+    self.subject = f"Welcome to {self.system_name}! Please click the link below to login."
+    self.from_email = "noreply@example.com"
     self.welcome_text: str = (
       f"Welcome to {self.system_name}! Please click the link below to login.<br>"
     )
@@ -51,12 +47,23 @@ class EmailRegisterInfo(EmailInfo):
     self.subject = (
       f"Welcome to {self.system_name}! Please click the link below to register."
     )
-    self.from_email = "svtter@163.com"
+    self.from_email = "noreply@example.com"
     self.welcome_text: str = (
       f"Welcome to {self.system_name}! Please click the link below to register.<br>"
     )
 
 
+def get_info_class(sys_name: str) -> t.Tuple[EmailLoginInfo, EmailRegisterInfo]:
+  class MyLoginInfo(EmailLoginInfo):
+    system_name = sys_name
+
+  class MyRegisterInfo(EmailRegisterInfo):
+    system_name = sys_name
+
+  return MyLoginInfo, MyRegisterInfo
+
+
+@dataclass
 class TimeLimit(object):
   minutes: int = 10
 
@@ -69,7 +76,7 @@ class MailRecord(object):
   sault: str
 
 
-class MailRecordMixin(abc.ABC):
+class MailRecordAPI(abc.ABC):
   """Mixin to get mail record."""
 
   @abc.abstractmethod
@@ -88,7 +95,7 @@ class MailRecordMixin(abc.ABC):
     raise NotImplementedError("")
 
 
-class EmailInfoMixin(MailRecordMixin):
+class EmailFunc(MailRecordAPI):
   """Mixin to send email."""
 
   login_info_class: t.Type[EmailLoginInfo]
@@ -131,24 +138,32 @@ class EmailInfoMixin(MailRecordMixin):
     msg.send()
 
   def send_login_mail(self, email: str):
-    """send login mail."""
+    """
+    send login mail.
+    """
+    # if user not exist, send register mail.
     if not self.check_user(email):
       mail_type = "register"
     else:
       mail_type = "login"
 
+    # if the email could not send, raise exception.
     if not self.check_could_send(email=email):
       raise Exception(f"Cannot send. Wait {self.tl.minutes} minutes.")
 
     self.send_valid(email, mail_type)
 
 
-class EmailValidateMixin(MailRecordMixin):
+class EmailValidateMixin(MailRecordAPI):
   """verify the token in url"""
 
   tl: TimeLimit
 
   def verify_login_mail(self, request, token_v: str):
+    """
+    verify the login mail.
+    if user not exist, create a new user.
+    """
     m = token.TokenManager(self.tl.minutes)
     token_str = m.decrypt_token(token=token_v)
     token_d = m.transform_token(token_str)
@@ -162,7 +177,12 @@ class EmailValidateMixin(MailRecordMixin):
       raise Exception("Invalid token.")
 
     User = get_user_model()
-    u = User.objects.get(email=m.get_mail(token_d))
+    u = User.objects.filter(email=m.get_mail(token_d)).first()
+    if not u:
+      # if user not exist, create a new user.
+      # support register by email.
+      u = User.objects.create(email=m.get_mail(token_d))
+
     if not u.is_active:
       raise Exception("Inactive user, disallow login.")
 

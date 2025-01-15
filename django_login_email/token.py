@@ -2,6 +2,7 @@
 import base64
 import datetime
 import json
+import logging
 import os
 import typing as t
 import urllib.parse
@@ -16,6 +17,8 @@ Email = str
 TokenDict = t.TypedDict(
   "TokenDict", {"email": Email, "expired_time": int, "salt": str, "mail_type": str}
 )
+
+logger = logging.getLogger(__name__)
 
 
 class TokenGenerator(object):
@@ -32,9 +35,7 @@ class TokenGenerator(object):
   def gen_salt(self, email) -> str:
     return email + str(base64.b64encode(os.urandom(16)))
 
-  def gen(
-    self, email, mail_type: str, save_token: t.Callable[[TokenDict], None]
-  ) -> str:
+  def gen(self, email, mail_type: str, save_token: t.Callable[[TokenDict], None]) -> str:
     """call save_token to save token in database or somewhere"""
     token: TokenDict = {
       "email": email,
@@ -65,10 +66,14 @@ class TokenManager(object):
     self, token_dict: TokenDict, get_salt: t.Callable[[], str]
   ) -> t.Optional[TokenDict]:
     """check salt and expire-time"""
-    if token_dict["salt"] == get_salt() and token_dict["expired_time"] > int(
-      datetime.datetime.now().timestamp()
-    ):
+    logger.info(f"token_dict: {token_dict}")
+    if not token_dict["salt"] == get_salt():
+      logger.info(f"salt is error, {token_dict['salt']}, {get_salt()}")
+      return None
+    if token_dict["expired_time"] > int(datetime.datetime.now().timestamp()):
+      logger.info("expired_time is ok")
       return token_dict
+    logger.info("expired_time is error")
     return None
 
   def get_mail(self, token_uncrypt: TokenDict) -> Email:
