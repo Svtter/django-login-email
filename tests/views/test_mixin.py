@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.auth import get_user_model
 
 from django_login_email import email
 from django_login_email.views import mixin
@@ -41,4 +42,13 @@ def test_send_valid(db, mx):
   # check mail record
   mr = mx.get_mail_record("svtter@163.com")
   assert mr.expired_time is not None
+  assert mr.validated is False
+
+
+def test_user_exist(db, mx):
+  User = get_user_model()
+  User.objects.create_user(username="svtter", email="svtter@163.com", password="123456")
+
+  mx.send_valid("svtter@163.com", "login")
+  mr = mx.get_mail_record("svtter@163.com")
   assert mr.validated is False

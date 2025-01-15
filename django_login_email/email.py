@@ -154,7 +154,7 @@ class EmailFunc(MailRecordAPI):
     self.send_valid(email, mail_type)
 
 
-class EmailValidateMixin(MailRecordAPI):
+class EmailVerifyMixin(MailRecordAPI):
   """verify the token in url"""
 
   tl: TimeLimit

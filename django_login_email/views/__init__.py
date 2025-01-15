@@ -16,7 +16,7 @@ from .mixin import MailRecordModelMixin
 logger = logging.getLogger(__name__)
 
 
-class EmailVerifyView(TemplateView, email.EmailValidateMixin, MailRecordModelMixin):
+class EmailVerifyView(TemplateView, email.EmailVerifyMixin, MailRecordModelMixin):
   """verify token in url"""
 
   tl = limit.LoginTimeLimit()
