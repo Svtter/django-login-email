@@ -57,3 +57,28 @@ def test_has_user(db, mx_send, mx_verify):
   assert mr.validated
 
   assert User.objects.filter(email="svtter@163.com").exists()
+
+
+def test_login_twice(db, mx_send, mx_verify):
+  User = get_user_model()
+  User.objects.create_user(username="svtter", email="svtter@163.com", password="123456")
+
+  # first login
+  get_token_b = wrap_token_manager(mx_send)
+  mx_send.send_valid("svtter@163.com", "login")
+  mr = mx_send.get_mail_record("svtter@163.com")
+  assert not mr.validated
+
+  mx_verify.verify_token(get_token_b())
+  mr = mx_send.get_mail_record("svtter@163.com")
+  assert mr.validated
+
+  # second login
+  get_token_b = wrap_token_manager(mx_send)
+  mx_send.send_valid("svtter@163.com", "login")
+  mr = mx_send.get_mail_record("svtter@163.com")
+  assert not mr.validated
+
+  mx_verify.verify_token(get_token_b())
+  mr = mx_send.get_mail_record("svtter@163.com")
+  assert mr.validated
