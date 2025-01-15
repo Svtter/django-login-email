@@ -47,9 +47,7 @@ class Mixin2(EmailInfoMixin):
   tl = MyTimeLit()
 
   def get_mail_record(self, mail: str) -> MailRecord:
-    r2 = MailRecord(
-      email="svtter@163.com", expired_time=None, validated=False, sault=""
-    )
+    r2 = MailRecord(email=sample_mail, expired_time=None, validated=False, sault="")
     return r2
 
   def save_token(self, token: TokenDict):
@@ -60,7 +58,7 @@ class Mixin2(EmailInfoMixin):
 
 
 def test_none_of_mixin():
-  mail = "svtter@163.com"
   e = Mixin2()
-  re = e.get_mail_record(mail=mail)
+  re = e.get_mail_record(sample_mail)
   assert re.expired_time is None
+  assert e.check_could_send(email=sample_mail)
