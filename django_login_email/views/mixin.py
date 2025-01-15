@@ -36,6 +36,7 @@ class MailRecordModelMixin(email.EmailFunc):
       mail.sault = token["salt"]
       mail.expired_time = self.transform_timestamp(token["expired_time"])
       mail.mail_type = token["mail_type"]
+      mail.validated = False
       mail.save()
 
     except models.EmailRecord.DoesNotExist:
@@ -44,6 +45,7 @@ class MailRecordModelMixin(email.EmailFunc):
         sault=token["salt"],
         expired_time=self.transform_timestamp(token["expired_time"]),
         mail_type=token["mail_type"],
+        validated=False,
       )
 
   def disable_token(self, token: token.TokenDict):
