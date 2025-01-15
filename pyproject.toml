@@ -1,11 +1,15 @@
 [project]
 name = "django-login-email"
-version = "0.4.1"
-description = ""
+dynamic = ["version"]
+description = "A django app for login with email."
 authors = [{ name = "svtter", email = "svtter@qq.com" }]
 dependencies = ["django>=5.0.4", "pycryptodome>=3.20.0"]
 readme = "README.md"
 requires-python = ">=3.10"
+
+[tool.pdm.version]
+source = "file"
+path = "django_login_email/__init__.py"
 
 [project.urls]
 homepage = "https://github.com/Svtter/django-login-email"
@@ -23,12 +27,13 @@ build-backend = "pdm.backend"
 
 [dependency-groups]
 dev = [
-    "python-dotenv>=1.0.1",
-    "pytest-django>=4.8.0",
-    "ipython>=8.23.0",
-    "ruff>=0.9.1",
-    "djlint>=1.36.4",
+  "python-dotenv>=1.0.1",
+  "pytest-django>=4.8.0",
+  "ipython>=8.23.0",
+  "ruff>=0.9.1",
+  "djlint>=1.36.4",
 ]
 
 [tool.ruff]
+line-length = 90
 indent-width = 2
