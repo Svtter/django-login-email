@@ -18,6 +18,9 @@ class EmailLoginView(FormView, MailRecordModelMixin):
   """process login by email"""
 
   template_name = "login_email/login.html"
+  error_template: str = "login_email/error.html"
+  success_template: str = "login_email/success.html"
+
   form_class = forms.LoginForm
 
   login_info_class = email.EmailLoginInfo
@@ -42,5 +45,5 @@ class EmailLoginView(FormView, MailRecordModelMixin):
       self.send_login_mail(form.cleaned_data["email"])
     except Exception as e:
       logger.error(e)
-      return render(self.request, "login_email/error.html", {"error": e})
-    return render(self.request, "login_email/success.html", {"form": form})
+      return render(self.request, self.error_template, {"error": e})
+    return render(self.request, self.success_template, {"form": form})
