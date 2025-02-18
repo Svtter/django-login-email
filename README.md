@@ -99,7 +99,7 @@ Debug the email with `docker run -d --name mailhog -p 1025:1025 -p 8025:8025 mai
 2. View [settings/settings.py] to config the email server account. As same as django official settings.
 3. Disable login check:
 
-```
+```python
 class YouLoginView(LoginView):
   def check_could_send(self, email) -> bool:
     # FOR DEBUG
