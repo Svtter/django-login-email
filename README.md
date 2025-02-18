@@ -95,7 +95,8 @@ Debug the email with `docker run -d --name mailhog -p 1025:1025 -p 8025:8025 mai
 
 ## Settings
 
-Config `LoginView.tl` to disable login attempts check.
+1. Config `LoginView.tl` to disable login attempts check.
+2. View [settings/settings.py] to config the email server account. As same as django official settings.
 
 ## Future
 
