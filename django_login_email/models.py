@@ -27,3 +27,22 @@ class EmailRecord(models.Model):
 
   def __str__(self) -> str:
     return f"Email: {self.email}, mail_type: {self.mail_type}"
+
+
+class IPBan(models.Model):
+  """用于处理 IP 禁止发送的情况"""
+
+  ip = models.GenericIPAddressField(verbose_name="IP Address", unique=True)
+  reason = models.TextField(verbose_name="Reason")
+  created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
+
+  def __str__(self) -> str:
+    return f"IP: {self.ip}"
+
+  @classmethod
+  def add_ip_ban(cls, ip: str, reason: str) -> "IPBan":
+    """添加 IP 禁止发送的情况"""
+    obj, _ = cls.objects.get_or_create(ip=ip)
+    obj.reason = reason
+    obj.save()
+    return obj
