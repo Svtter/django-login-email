@@ -25,7 +25,9 @@ List of the urls for exmaple project:
 - [x] Register new user.
 - [x] Support multiple user.
 - [x] Ban the IP to send mail frequently without login.
-- [ ] Change email address.
+- [ ] Support [django-templated-email](https://github.com/vintasoftware/django-templated-email)
+- [ ] Support Django Anymail
+- [ ] Allow users to change their email address.
 - [ ] Enable 2FA.
 - [ ] More easier and customizable login link.
 
