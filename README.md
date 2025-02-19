@@ -112,5 +112,6 @@ class YouLoginView(LoginView):
 
 ## Related project
 
+- [django-email-verification](https://github.com/LeoneBacciu/django-email-verification)
 - [django-login-with-email](https://github.com/wsvincent/django-login-with-email)
 - [django-unique-user-email](https://github.com/carltongibson/django-unique-user-email)
