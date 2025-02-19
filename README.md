@@ -24,8 +24,8 @@ List of the urls for exmaple project:
 - [x] The link could be used for Login once.
 - [x] Register new user.
 - [x] Support multiple user.
+- [x] Ban the IP to send mail frequently without login.
 - [ ] Change email address.
-- [ ] Ban the IP to send mail frequently without login.
 - [ ] Enable 2FA.
 - [ ] More easier and customizable login link.
 
