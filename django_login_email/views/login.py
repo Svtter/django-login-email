@@ -2,6 +2,7 @@
 import logging
 from typing import Any
 
+from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.generic.edit import FormView
@@ -14,6 +15,12 @@ from .mixin import MailRecordModelMixin
 logger = logging.getLogger(__name__)
 
 
+class MyEmailLoginInfo(email.EmailLoginInfo):
+  def __init__(self):
+    super().__init__()
+    self.from_email = settings.EMAIL_HOST_USER
+
+
 class EmailLoginView(FormView, MailRecordModelMixin, iputils.IPBanUtils):
   """process login by email"""
 
@@ -23,7 +30,7 @@ class EmailLoginView(FormView, MailRecordModelMixin, iputils.IPBanUtils):
 
   form_class = forms.LoginForm
 
-  login_info_class = email.EmailLoginInfo
+  login_info_class = MyEmailLoginInfo
   register_info_class = email.EmailRegisterInfo
 
   tl = limit.LoginTimeLimit()
