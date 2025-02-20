@@ -36,7 +36,7 @@ class EmailLoginView(FormView, MailRecordModelMixin, iputils.IPBanUtils):
   def form_valid(self, form):
     """check the email"""
 
-    if self.is_ip_banned(self.get_client_ip()):
+    if self.is_ip_banned(self.get_client_ip(self.request)):
       return render(self.request, self.error_template, {"error": "Your IP is banned."})
 
     # Not allow to login if the user is already authenticated.
