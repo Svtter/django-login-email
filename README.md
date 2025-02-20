@@ -5,7 +5,7 @@
 
 Allow user to login and register with email address.
 
-NOTICE: we are currently at developing stage, if you use this library, please upgrade to the latest version.
+NOTICE: We are currently in the development stage. If you use this library, please upgrade to the latest version. Issues are welcome.
 
 ## Install
 
