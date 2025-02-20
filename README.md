@@ -5,6 +5,8 @@
 
 Allow user to login and register with email address.
 
+NOTICE: We are currently in the development stage. If you use this library, please upgrade to the latest version. Issues are welcome.
+
 ## Install
 
 `pip install django-login-email`
