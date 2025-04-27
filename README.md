@@ -7,6 +7,8 @@ Allow user to login and register with email address.
 
 NOTICE: We are currently in the development stage. If you use this library, please upgrade to the latest version. Issues are welcome.
 
+You can view the documentation [here](https://deepwiki.com/Svtter/django-login-email).
+
 ## Install
 
 `pip install django-login-email`
