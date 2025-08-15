@@ -23,9 +23,9 @@ class EmailInfo(object):
   url: str = "http://127.0.0.1:8000/account/verify?token="
   login_message: string.Template = string.Template('Click <a href="$url$token">Link</a>')
 
-  def set_token(self, value):
+  def build_message(self, token):
     self.message = self.welcome_text + self.login_message.substitute(
-      url=self.url, token=value
+      url=self.url, token=token
     )
 
 
@@ -133,7 +133,7 @@ class EmailFunc(MailRecordAPI):
 
     m = self.get_token_manager()
     encrypt_token = m.encrypt_mail(email, mail_type, self.save_token)
-    e.set_token(encrypt_token)
+    e.build_message(encrypt_token)
 
     msg = EmailMessage(e.subject, e.message, e.from_email, [email])
     msg.content_subtype = "html"
