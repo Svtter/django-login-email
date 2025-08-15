@@ -53,7 +53,7 @@ class EmailRegisterInfo(EmailInfo):
     )
 
 
-def get_info_class(sys_name: str) -> t.Tuple[EmailLoginInfo, EmailRegisterInfo]:
+def get_info_class(sys_name: str) -> t.Tuple[t.Type[EmailLoginInfo], t.Type[EmailRegisterInfo]]:
   class MyLoginInfo(EmailLoginInfo):
     system_name = sys_name
 
