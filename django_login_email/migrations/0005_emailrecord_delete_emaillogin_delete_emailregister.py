@@ -4,27 +4,39 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
+  dependencies = [
+    ("django_login_email", "0004_emailregister"),
+  ]
 
-    dependencies = [
-        ('django_login_email', '0004_emailregister'),
-    ]
-
-    operations = [
-        migrations.CreateModel(
-            name='EmailRecord',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('expired_time', models.DateTimeField(auto_now_add=True, verbose_name='Last register request time')),
-                ('validated', models.BooleanField(default=False, verbose_name='Register Token validated')),
-                ('mail_type', models.CharField(max_length=100, verbose_name='Mail type')),
-                ('sault', models.CharField(max_length=100, verbose_name='Sault')),
-                ('email', models.EmailField(max_length=254, unique=True, verbose_name='Email')),
-            ],
+  operations = [
+    migrations.CreateModel(
+      name="EmailRecord",
+      fields=[
+        (
+          "id",
+          models.BigAutoField(
+            auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+          ),
         ),
-        migrations.DeleteModel(
-            name='EmailLogin',
+        (
+          "expired_time",
+          models.DateTimeField(
+            auto_now_add=True, verbose_name="Last register request time"
+          ),
         ),
-        migrations.DeleteModel(
-            name='EmailRegister',
+        (
+          "validated",
+          models.BooleanField(default=False, verbose_name="Register Token validated"),
         ),
-    ]
+        ("mail_type", models.CharField(max_length=100, verbose_name="Mail type")),
+        ("sault", models.CharField(max_length=100, verbose_name="Sault")),
+        ("email", models.EmailField(max_length=254, unique=True, verbose_name="Email")),
+      ],
+    ),
+    migrations.DeleteModel(
+      name="EmailLogin",
+    ),
+    migrations.DeleteModel(
+      name="EmailRegister",
+    ),
+  ]

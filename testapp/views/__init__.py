@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.urls import reverse
 
 from django_login_email import email as e

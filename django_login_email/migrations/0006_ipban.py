@@ -4,19 +4,26 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
+  dependencies = [
+    ("django_login_email", "0005_emailrecord_delete_emaillogin_delete_emailregister"),
+  ]
 
-    dependencies = [
-        ('django_login_email', '0005_emailrecord_delete_emaillogin_delete_emailregister'),
-    ]
-
-    operations = [
-        migrations.CreateModel(
-            name='IPBan',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('ip', models.GenericIPAddressField(unique=True, verbose_name='IP Address')),
-                ('reason', models.TextField(verbose_name='Reason')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created at')),
-            ],
+  operations = [
+    migrations.CreateModel(
+      name="IPBan",
+      fields=[
+        (
+          "id",
+          models.BigAutoField(
+            auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+          ),
         ),
-    ]
+        ("ip", models.GenericIPAddressField(unique=True, verbose_name="IP Address")),
+        ("reason", models.TextField(verbose_name="Reason")),
+        (
+          "created_at",
+          models.DateTimeField(auto_now_add=True, verbose_name="Created at"),
+        ),
+      ],
+    ),
+  ]

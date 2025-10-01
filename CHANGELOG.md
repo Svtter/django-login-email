@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.3] - 2025-10-01
+
+### Fixed
+- Removed unused imports in forms and testapp views
+- Fixed code formatting issues across multiple files
+- Resolved timezone warnings in tests by using timezone-aware datetime objects
+- Improved overall code quality with ruff linting and formatting
+
+### Changed
+- Added CLAUDE.md documentation for project guidance
+
 ## [0.6.2] - 2024-10-01
 
 ### Added

@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
+  dependencies = [
+    ("django_login_email", "0002_emaillogin_sault_emaillogin_validated_and_more"),
+  ]
 
-    dependencies = [
-        ('django_login_email', '0002_emaillogin_sault_emaillogin_validated_and_more'),
-    ]
-
-    operations = [
-        migrations.RenameField(
-            model_name='emaillogin',
-            old_name='last_time',
-            new_name='expired_time',
-        ),
-    ]
+  operations = [
+    migrations.RenameField(
+      model_name="emaillogin",
+      old_name="last_time",
+      new_name="expired_time",
+    ),
+  ]

@@ -4,19 +4,25 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
+  initial = True
 
-    initial = True
+  dependencies = []
 
-    dependencies = [
-    ]
-
-    operations = [
-        migrations.CreateModel(
-            name='EmailLogin',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('last_time', models.DateTimeField(auto_now_add=True, verbose_name='Last login request time')),
-                ('email', models.EmailField(max_length=254, verbose_name='Email')),
-            ],
+  operations = [
+    migrations.CreateModel(
+      name="EmailLogin",
+      fields=[
+        (
+          "id",
+          models.BigAutoField(
+            auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+          ),
         ),
-    ]
+        (
+          "last_time",
+          models.DateTimeField(auto_now_add=True, verbose_name="Last login request time"),
+        ),
+        ("email", models.EmailField(max_length=254, verbose_name="Email")),
+      ],
+    ),
+  ]
