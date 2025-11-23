@@ -7,7 +7,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.generic.edit import FormView
 
-from django_login_email import email, forms, iputils
+from django_login_email import email, errors, forms, iputils
 
 from . import limit
 from .mixin import MailRecordModelMixin
@@ -54,7 +54,17 @@ class EmailLoginView(FormView, MailRecordModelMixin, iputils.IPBanUtils):
       # send login mail. If user not exist, send register mail.
       self.send_login_mail(form.cleaned_data["email"])
       self.record_send(self.request)
-    except Exception as e:
-      logger.error(e)
+    except errors.RateLimitError as e:
+      logger.warning(f"Rate limit exceeded: {e}")
       return render(self.request, self.error_template, {"error": e})
+    except errors.EmailSendError as e:
+      logger.error(f"Email sending failed: {e}")
+      return render(
+        self.request,
+        self.error_template,
+        {"error": "Failed to send email. Please try again later."},
+      )
+    except ValueError as e:
+      logger.error(f"Invalid mail type: {e}")
+      return render(self.request, self.error_template, {"error": "Internal error occurred."})
     return render(self.request, self.success_template, {"form": form})
