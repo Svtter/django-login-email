@@ -11,7 +11,7 @@ class EmailRecord(models.Model):
   )
   validated = models.BooleanField(default=False, verbose_name="Register Token validated")
   mail_type = models.CharField(max_length=100, verbose_name="Mail type")
-  sault = models.CharField(max_length=100, verbose_name="Sault")
+  salt = models.CharField(max_length=100, verbose_name="Salt")
   email = models.EmailField(verbose_name="Email", unique=True, null=False)
 
   @classmethod
