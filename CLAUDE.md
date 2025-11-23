@@ -9,25 +9,29 @@ Django Login Email is a Django package that enables passwordless authentication 
 ## Development Commands
 
 ### Project Setup
-- **Install dependencies**: `pdm install` (uses PDM as package manager)
+- **Install dependencies with PDM**: `pdm install` (uses PDM as package manager)
+- **Install dependencies with uv**: `uv sync` (uses uv as package manager)
 - **Install in development mode**: `pip install -e .`
+- **Run commands with uv**: Use `uv run <command>` to run commands in the virtual environment
+  - Example: `uv run pytest` to run tests
+  - Example: `uv run python manage.py runserver` to start the server
 
 ### Testing
-- **Run all tests**: `pytest` (uses pytest-django)
-- **Run specific test file**: `pytest tests/test_models.py`
-- **Run with verbose output**: `pytest -v`
+- **Run all tests**: `pytest` or `uv run pytest` (uses pytest-django)
+- **Run specific test file**: `pytest tests/test_models.py` or `uv run pytest tests/test_models.py`
+- **Run with verbose output**: `pytest -v` or `uv run pytest -v`
 - **Test settings module**: Configured in `pyproject.toml` as `settings.settings`
 
 ### Code Quality
-- **Lint code**: `ruff check .`
-- **Format code**: `ruff format .`
+- **Lint code**: `ruff check .` or `uv run ruff check .`
+- **Format code**: `ruff format .` or `uv run ruff format .`
 - **Line length**: 90 characters (configured in pyproject.toml)
 
 ### Django Management
-- **Run migrations**: `python manage.py migrate`
-- **Create migrations**: `python manage.py makemigrations`
-- **Run development server**: `python manage.py runserver`
-- **Create superuser**: `python manage.py createsuperuser`
+- **Run migrations**: `python manage.py migrate` or `uv run python manage.py migrate`
+- **Create migrations**: `python manage.py makemigrations` or `uv run python manage.py makemigrations`
+- **Run development server**: `python manage.py runserver` or `uv run python manage.py runserver`
+- **Create superuser**: `python manage.py createsuperuser` or `uv run python manage.py createsuperuser`
 
 ### Documentation
 - **Build docs**: `cd docs && make html`
