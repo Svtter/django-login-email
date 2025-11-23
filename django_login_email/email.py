@@ -75,7 +75,7 @@ class MailRecord(object):
   expired_time: t.Optional[datetime.datetime]
   email: str
   validated: bool
-  sault: str
+  salt: str
 
 
 class MailRecordAPI(abc.ABC):
@@ -172,7 +172,7 @@ class EmailVerifyMixin(MailRecordAPI):
     if mr.validated:
       raise errors.ValidatedError("Token already validated.")
 
-    token_d = m.check_token(token_d, lambda: mr.sault)
+    token_d = m.check_token(token_d, lambda: mr.salt)
     if token_d is None:
       raise errors.TokenError("Invalid token.")
 

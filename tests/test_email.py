@@ -21,7 +21,7 @@ class Mixin(EmailFunc):
       expired_time=datetime.datetime.now(tz=datetime.timezone.utc)
       - datetime.timedelta(minutes=10),
       validated=False,
-      sault="",
+      salt="",
     )
     return r1
 
@@ -47,7 +47,7 @@ class Mixin2(EmailFunc):
   tl = MyTimeLit()
 
   def get_mail_record(self, mail: str) -> MailRecord:
-    r2 = MailRecord(email=sample_mail, expired_time=None, validated=False, sault="")
+    r2 = MailRecord(email=sample_mail, expired_time=None, validated=False, salt="")
     return r2
 
   def save_token(self, token: TokenDict):
