@@ -153,7 +153,7 @@ class EmailFunc(MailRecordAPI):
 
     # if the email could not send, raise exception.
     if not self.check_could_send(email=email):
-      raise Exception(f"Cannot send. Wait {self.tl.minutes} minutes.")
+      raise errors.RateLimitError(f"Cannot send. Wait {self.tl.minutes} minutes.")
 
     self.send_valid(email, mail_type)
 
@@ -184,7 +184,7 @@ class EmailVerifyMixin(MailRecordAPI):
       u = User.objects.create(username=m.get_mail(token_d), email=m.get_mail(token_d))
 
     if not u.is_active:
-      raise Exception("Inactive user, disallow login.")
+      raise errors.InactiveUserError("Inactive user, disallow login.")
 
     self.disable_token(token=token_d)
     return u
