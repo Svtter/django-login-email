@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
+  dependencies = [
+    ("django_login_email", "0006_ipban"),
+  ]
 
-    dependencies = [
-        ('django_login_email', '0006_ipban'),
-    ]
-
-    operations = [
-        migrations.RenameField(
-            model_name='emailrecord',
-            old_name='sault',
-            new_name='salt',
-        ),
-    ]
+  operations = [
+    migrations.RenameField(
+      model_name="emailrecord",
+      old_name="sault",
+      new_name="salt",
+    ),
+  ]

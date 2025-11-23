@@ -50,10 +50,18 @@ class EmailLoginView(FormView, MailRecordModelMixin, iputils.IPBanUtils):
     if self.request.user.is_authenticated:
       return redirect("home")
 
+    # Record the send attempt and check if rate limit is exceeded (before sending email)
+    if not self.record_send(self.request):
+      logger.warning(f"IP rate limit exceeded for {self.get_client_ip(self.request)}")
+      return render(
+        self.request,
+        self.error_template,
+        {"error": "Too many requests. Please try again later."},
+      )
+
     try:
       # send login mail. If user not exist, send register mail.
       self.send_login_mail(form.cleaned_data["email"])
-      self.record_send(self.request)
     except errors.RateLimitError as e:
       logger.warning(f"Rate limit exceeded: {e}")
       return render(self.request, self.error_template, {"error": e})
@@ -66,5 +74,7 @@ class EmailLoginView(FormView, MailRecordModelMixin, iputils.IPBanUtils):
       )
     except ValueError as e:
       logger.error(f"Invalid mail type: {e}")
-      return render(self.request, self.error_template, {"error": "Internal error occurred."})
+      return render(
+        self.request, self.error_template, {"error": "Internal error occurred."}
+      )
     return render(self.request, self.success_template, {"form": form})
