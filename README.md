@@ -9,6 +9,15 @@ NOTICE: We are currently in the development stage. If you use this library, plea
 
 You can view the documentation [here](https://deepwiki.com/Svtter/django-login-email).
 
+## Documentation
+
+- **[Integration Guide](./docs/requirements/integration-requirements.md)** - How to integrate into your Django project
+- **[API Reference](./docs/requirements/api-specification.md)** - Complete API documentation with stability guarantees
+- **[Configuration Guide](./docs/requirements/configuration-reference.md)** - All configuration options explained
+- **[Extension Points](./docs/requirements/extension-points.md)** - How to customize and extend functionality
+- **[Compatibility Matrix](./docs/requirements/compatibility-matrix.md)** - Supported Python, Django, and database versions
+- **[Security Policy](./SECURITY.md)** - Security features and best practices
+
 ## Install
 
 `pip install django-login-email`
@@ -101,9 +110,15 @@ Debug the email with `docker run -d --name mailhog -p 1025:1025 -p 8025:8025 mai
 
 ## Settings
 
-1. Config `LoginView.tl` to disable login attempts check.
-2. View [settings/settings.py](./settings/settings.py) to config the email server account. As same as django official settings.
-3. Disable login check:
+For detailed configuration options, see the [Configuration Reference](./docs/requirements/configuration-reference.md).
+
+Quick settings overview:
+
+1. Config `LoginView.tl` to adjust rate limiting (default: 10 minutes between emails)
+2. Configure email server settings in your Django `settings.py` (see [settings/settings.py](./settings/settings.py) for examples)
+3. Customize email templates by subclassing `EmailLoginInfo` and `EmailRegisterInfo`
+
+Example - Disable rate limiting for development:
 
 ```python
 class YouLoginView(LoginView):
@@ -111,6 +126,26 @@ class YouLoginView(LoginView):
     # FOR DEBUG
     return True
 ```
+
+## Compatibility
+
+- **Python**: 3.10+ (tested: 3.10, 3.11, 3.12)
+- **Django**: 5.0.4+ (tested: 5.0.x)
+- **Databases**: SQLite, PostgreSQL, MySQL/MariaDB
+
+See [COMPATIBILITY.md](./COMPATIBILITY.md) for detailed version support.
+
+## Security
+
+This package implements passwordless authentication with the following security features:
+
+- ✅ AES-encrypted tokens
+- ✅ Time-limited tokens (default: 10 minutes)
+- ✅ One-time use tokens
+- ✅ Rate limiting
+- ✅ IP banning for abuse prevention
+
+See [SECURITY.md](./SECURITY.md) for security policy and best practices.
 
 ## Future
 
