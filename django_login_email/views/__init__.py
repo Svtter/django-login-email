@@ -32,10 +32,14 @@ class EmailVerifyView(TemplateView, email.EmailVerifyMixin, MailRecordModelMixin
       return render(self.request, self.error_template, {"error": e})
     except errors.TokenError as e:
       logger.error(f"Token error: {e}")
-      return render(self.request, self.error_template, {"error": "Invalid or expired token."})
+      return render(
+        self.request, self.error_template, {"error": "Invalid or expired token."}
+      )
     except errors.InactiveUserError as e:
       logger.warning(f"Inactive user attempted login: {e}")
-      return render(self.request, self.error_template, {"error": "Your account is inactive."})
+      return render(
+        self.request, self.error_template, {"error": "Your account is inactive."}
+      )
     except (ValueError, KeyError) as e:
       logger.error(f"Token decryption/parsing error: {e}")
       raise Http404("Invalid Request")

@@ -20,7 +20,7 @@ class Recorder(object):
     Else, incr `ip` in cache.
     """
     count = cache.get_or_set(ip, 0, self.minutes * 60)
-    if count <= self.times:
+    if count < self.times:
       cache.incr(ip)
       return True
     else:
@@ -41,25 +41,47 @@ class IPBanUtils(object):
   def get_client_ip(self, request: HttpRequest) -> str:
     """获取用户的真实IP地址
 
+    Security Note:
+        By default, this method only uses REMOTE_ADDR to prevent IP spoofing.
+        Set USE_X_FORWARDED_FOR = True in Django settings only if your application
+        is behind a trusted reverse proxy (nginx, apache, cloudflare, etc.) and
+        the proxy is properly configured to set X-Forwarded-For.
+
     Args:
         request: Django HTTP请求对象
 
     Returns:
         str: 用户的IP地址
     """
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-    if x_forwarded_for:
-      ip = x_forwarded_for.split(",")[0]
-    else:
-      ip = request.META.get("REMOTE_ADDR")
+    # Check if we should trust X-Forwarded-For header (only behind trusted proxy)
+    from django.conf import settings
+
+    use_x_forwarded_for = getattr(settings, "USE_X_FORWARDED_FOR", False)
+
+    if use_x_forwarded_for:
+      x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+      if x_forwarded_for:
+        # Get the first IP in the chain (client IP)
+        # Format: "client, proxy1, proxy2"
+        ip = x_forwarded_for.split(",")[0].strip()
+        return ip
+
+    # Default: use REMOTE_ADDR (safe, cannot be spoofed)
+    ip = request.META.get("REMOTE_ADDR", "")
     return ip
 
-  def record_send(self, request: HttpRequest) -> None:
-    """记录发送情况"""
+  def record_send(self, request: HttpRequest) -> bool:
+    """记录发送情况
 
+    Args:
+        request: Django HTTP请求对象
+
+    Returns:
+        bool: 如果允许发送返回True，如果超过限制返回False
+    """
     # 记录发送
     ip = self.get_client_ip(request)
-    self.recorder.record(ip)
+    return self.recorder.record(ip)
 
   def is_ip_banned(self, ip: str) -> bool:
     """检查IP是否被禁止

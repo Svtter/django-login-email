@@ -1,6 +1,7 @@
 # Handle email token
 import base64
 import datetime
+import hashlib
 import json
 import logging
 import os
@@ -55,7 +56,8 @@ class TokenManager(object):
   generator: TokenGenerator
 
   def __init__(self, minutes: int) -> None:
-    self.key = settings.SECRET_KEY[:32].encode("utf-8")
+    # Use SHA-256 to derive a fixed 32-byte key from SECRET_KEY
+    self.key = hashlib.sha256(settings.SECRET_KEY.encode("utf-8")).digest()
     self.generator: TokenGenerator = TokenGenerator(minutes)
 
   def transform_token(self, token_uncrypt: Token) -> TokenDict:
