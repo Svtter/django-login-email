@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>django-login-email documentation &#8212; django-login-email  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="For Developer" href="developer.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="django-login-email-documentation">
+<h1>django-login-email documentation<a class="headerlink" href="#django-login-email-documentation" title="Link to this heading">¶</a></h1>
+<a class="reference external image-reference" href="https://pypi.python.org/pypi/django-login-email/"><img alt="https://img.shields.io/pypi/v/django-login-email.svg" src="https://img.shields.io/pypi/v/django-login-email.svg" />
+</a>
+<a class="reference external image-reference" href="https://django-login-email.readthedocs.io/en/latest/?badge=latest"><img alt="https://readthedocs.org/projects/django-login-email/badge/?version=latest" src="https://readthedocs.org/projects/django-login-email/badge/?version=latest" />
+</a>
+<a class="reference external image-reference" href="https://pepy.tech/project/django-login-email"><img alt="https://pepy.tech/badge/django-login-email/week" src="https://pepy.tech/badge/django-login-email/week" />
+</a>
+<p>Allow user to login and register with email address.</p>
+<p>NOTICE: We are currently in the development stage. If you use this library, please upgrade to the latest version. Issues are welcome.</p>
+<p>You can view the documentation <a class="reference external" href="https://deepwiki.com/Svtter/django-login-email">here</a>.</p>
+<section id="install">
+<h2>Install<a class="headerlink" href="#install" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>django-login-email
+</pre></div>
+</div>
+</section>
+<section id="feature">
+<h2>Feature<a class="headerlink" href="#feature" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>[x] The developer could define their own <code class="docutils literal notranslate"><span class="pre">User</span></code> model</p></li>
+<li><p>[x] Time-limited of login link</p></li>
+<li><p>[x] Limited of sending email (using TimeLimit to set minutes)</p></li>
+<li><p>[x] The link could be used for Login once</p></li>
+<li><p>[x] Register new user</p></li>
+<li><p>[x] Support multiple user</p></li>
+<li><p>[x] Ban the IP to send mail frequently without login</p></li>
+<li><p>[ ] Support <a class="reference external" href="https://github.com/vintasoftware/django-templated-email">django-templated-email</a></p></li>
+<li><p>[ ] Support Django Anymail</p></li>
+<li><p>[ ] Allow users to change their email address</p></li>
+<li><p>[ ] Enable 2FA</p></li>
+<li><p>[ ] More easier and customizable login link</p></li>
+</ul>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h2>
+<p>Add <code class="docutils literal notranslate"><span class="pre">django_login_email</span></code> to your app <code class="docutils literal notranslate"><span class="pre">settings.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">INSTALLED_APP</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="o">...</span><span class="p">,</span>
+    <span class="s1">&#39;django_login_email&#39;</span><span class="p">,</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Implement the LoginView:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">render</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django_login_email</span><span class="w"> </span><span class="kn">import</span> <span class="n">email</span> <span class="k">as</span> <span class="n">e</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django_login_email</span><span class="w"> </span><span class="kn">import</span> <span class="n">views</span> <span class="k">as</span> <span class="n">v</span>
+
+<span class="n">loginInfo</span><span class="p">,</span> <span class="n">registerInfo</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">get_info_class</span><span class="p">(</span><span class="s2">&quot;meterhub&quot;</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">LoginView</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">EmailLoginView</span><span class="p">):</span>
+    <span class="n">login_info_class</span> <span class="o">=</span> <span class="n">loginInfo</span>
+    <span class="n">register_info_class</span> <span class="o">=</span> <span class="n">registerInfo</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">VerifyView</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">EmailVerifyView</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s2">&quot;home&quot;</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">LogoutView</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">EmailLogoutView</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Set the view in your <code class="docutils literal notranslate"><span class="pre">urls.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+<span class="kn">from</span><span class="w"> </span><span class="o">&lt;</span><span class="n">yourapp</span><span class="o">&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">views</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">v</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django_login_email.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">HomeView</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="o">...</span><span class="p">,</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;account/login&quot;</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">LoginView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;login&quot;</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;account/verify&quot;</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">VerifyView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;verify&quot;</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;account/logout&quot;</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">LogoutView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;logout&quot;</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">HomeView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;home&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Debug the email with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>mailhog<span class="w"> </span>-p<span class="w"> </span><span class="m">1025</span>:1025<span class="w"> </span>-p<span class="w"> </span><span class="m">8025</span>:8025<span class="w"> </span>mailhog/mailhog
+</pre></div>
+</div>
+</section>
+<section id="settings">
+<h2>Settings<a class="headerlink" href="#settings" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Config <code class="docutils literal notranslate"><span class="pre">LoginView.tl</span></code> to disable login attempts check</p></li>
+<li><p>View <a class="reference external" href="./settings/settings.py">settings/settings.py</a> to config the email server account (same as Django official settings)</p></li>
+<li><p>Disable login check:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">YouLoginView</span><span class="p">(</span><span class="n">LoginView</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_could_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="c1"># FOR DEBUG</span>
+        <span class="k">return</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</section>
+<section id="future">
+<h2>Future<a class="headerlink" href="#future" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Academically prove the safety of this method</p></li>
+</ul>
+</section>
+<section id="related-project">
+<h2>Related project<a class="headerlink" href="#related-project" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/LeoneBacciu/django-email-verification">django-email-verification</a></p></li>
+<li><p><a class="reference external" href="https://github.com/wsvincent/django-login-with-email">django-login-with-email</a></p></li>
+<li><p><a class="reference external" href="https://github.com/carltongibson/django-unique-user-email">django-unique-user-email</a></p></li>
+</ul>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">For Developer</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">django-login-email</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">For Developer</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="developer.html" title="next chapter">For Developer</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, svtter.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
